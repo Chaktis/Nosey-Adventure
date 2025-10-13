@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factory Runes</title>
+
+    <style> /* Need to load fonts before it tries to load Phaser */
+        @font-face {
+        font-family: 'Alagard';
+        src: url('assets/alagard.ttf') format('truetype');
+        }
+
+        @font-face {
+        font-family: 'PressStart';
+        src: url('assets/PressStart2P.ttf') format('truetype');
+        }
+    </style>
+    <div style="font-family:Alagard; position:absolute; left:-1000px; visibility:hidden;">.</div>
+    <div style="font-family:PressStart; position:absolute; left:-1000px; visibility:hidden;">.</div>
+
+    <script src="./lib/phaser.js"></script>
+    <script src="./src/Scenes/LevelOne.js"></script>
+    <script src="./src/Scenes/Load.js"></script>
+    <script src="./src/main.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black; /* this changes the window background */
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #phaser-game canvas {
+            display: block;
+        }
+    </style>
+    
+
+
+</head>
+<body>
+    <div id="phaser-game"></div>
+    <span id="description"></span>
+</body>
+</html>
