@@ -8,8 +8,8 @@ class LevelOne extends Phaser.Scene{
 
         // PLAYER JUMP VALUES
         this.ACCELERATION = 1000;
-        this.MAX_VELOCITY = 200;
-        this.DRAG = 10000;
+        this.MAX_VELOCITY = 170;
+        this.DRAG = 6000;
         this.AIR_DRAG = 10000;
         this.JUMP_VELOCITY = -500;
         this.physics.world.gravity.y = 1000;
@@ -53,7 +53,7 @@ class LevelOne extends Phaser.Scene{
 
         // TILEMAP SETUP
         // Create new 16x16 tilemap game object that uses pixel tiles, 40 tiles wide and 30 tiles tall.
-        this.map = this.add.tilemap("level-one", 16, 16, 40, 30);
+        this.map = this.add.tilemap("level-one", 16, 16, 183, 120);
 
         // Add a tileset to the map
         const oneBit = this.map.addTilesetImage("black_tile", "black_tile");
@@ -82,7 +82,7 @@ class LevelOne extends Phaser.Scene{
 
 
         // PLAYER SETUP
-        this.player = this.physics.add.sprite(100, 900, "characters", 240);
+        this.player = this.physics.add.sprite(2750, 10, "characters", 240);
         this.player.setCollideWorldBounds(true);
         this.player.setScale(1.8);
         this.player.setOrigin(0, 0);
@@ -195,8 +195,7 @@ class LevelOne extends Phaser.Scene{
             spike.flipX = obj.flippedHorizontal || false;
             spike.flipY = obj.flippedVertical || false;
 
-            // MANUAL COLLISIONS
-
+            // MANUAL COLLISIONs
             // default spike collision box (FrameInt: 183, No Vertical, No Horizontal, Rotation 0)
             let bodyX = 32;
             let bodyY = 32;
@@ -368,8 +367,8 @@ class LevelOne extends Phaser.Scene{
 
 
         // CAMERA SETUP
-        this.cameras.main.setBounds(0, 0, 2570, 4000);
-        this.physics.world.setBounds(0, 0, 2570, 4000);
+        this.cameras.main.setBounds(0, 0, 5140, 8500);
+        this.physics.world.setBounds(0, 0, 5140, 8500);
         this.cameras.main.startFollow(this.player, true, 0.08, 0.08, 100, 0);
         this.cameras.main.setDeadzone(150, 150);
         this.cameras.main.setZoom(2.0);
