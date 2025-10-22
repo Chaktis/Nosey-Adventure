@@ -312,10 +312,17 @@ class LevelOne extends Phaser.Scene{
         this.physics.add.overlap(this.player, this.coinGroup, (obj1, obj2) => {
             //trigger particle effect
             this.coinCollectParticles.explode(10, obj2.x, obj2.y);
+
             // remove coin on overlap
             obj2.destroy(); 
             this.coinCount++;
             this.coinScore.setText('x ' + this.coinCount);
+
+            // Add health for every 10 coins collected
+            if (this.coinCount % 10 == 0) {
+                this.health++;
+                this.healthCounter.setText('x ' + this.health);
+            }
         })
 
 
