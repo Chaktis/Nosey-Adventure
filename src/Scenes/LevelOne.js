@@ -305,6 +305,7 @@ class LevelOne extends Phaser.Scene{
             key.destroy();
             this.keysCollected++;
             this.keyCount.setText('x ' + this.keysCollected);
+            this.sound.play("pickupKey", { volume: 0.5 });
             this.unlockNextLock();
         });
 
@@ -318,6 +319,7 @@ class LevelOne extends Phaser.Scene{
             obj2.destroy(); 
             this.coinCount++;
             this.coinScore.setText('x ' + this.coinCount);
+            this.sound.play("pickupCoin", { volume: 0.5 });
 
             // Add health for every 10 coins collected
             if (this.coinCount % 10 == 0) {
@@ -429,6 +431,10 @@ class LevelOne extends Phaser.Scene{
             // Handle jumping input
             if (this.player.body.blocked.down && (Phaser.Input.Keyboard.JustDown(this.cursors.up) || Phaser.Input.Keyboard.JustDown(this.keys.W) || Phaser.Input.Keyboard.JustDown(this.spaceKey))) {
                 this.player.setVelocityY(this.JUMP_VELOCITY);
+                this.sound.play("jump", {
+                        volume: 0.5,
+                        rate: Phaser.Math.FloatBetween(0.95, 1.15)
+                    });
             }
 
             //#################################################################
@@ -508,6 +514,7 @@ class LevelOne extends Phaser.Scene{
                 this.isHurt = true;
                 this.player.anims.stop();
                 this.player.anims.play('hurt', true);
+                this.sound.play("hurt", { volume: 0.5 });
 
                 // Reset flag after a delay
                 this.time.delayedCall(this.damageCooldown, () => {
@@ -525,6 +532,7 @@ class LevelOne extends Phaser.Scene{
 
         this.inputEnabled = false;
         this.player.setAccelerationX(0);
+        this.sound.play("death", { volume: 0.5 });
 
         // Dim background layers
         this.bgLayer.alpha = 0.15;
