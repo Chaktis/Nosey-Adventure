@@ -9,6 +9,7 @@ class Load extends Phaser.Scene {
         // Load tilemap information
         this.load.image("monochrome_tilemap_transparent", "monochrome_tilemap_transparent_packed.png");
         this.load.image("black_tile", "black_tile.png");
+        this.load.image("crystal_tilemap", "crystal_tilemap.png");
 
         // Load images
         this.load.image("coin_particle", "coin_particle.png");
@@ -29,21 +30,8 @@ class Load extends Phaser.Scene {
         // Packed tilemap
         this.load.tilemapTiledJSON("level-one", "final_game.json");   // Tilemap in JSON
 
-        /*// Load audio
-        this.load.audio("coinCollect", "coin_collect.mp3");
-        this.load.audio("keyCollect", "key_collect.mp3");
-        this.load.audio("jump", "jump.mp3");
-        this.load.audio("attack", "laser.mp3");
-        this.load.audio("hurt", "take_damage.mp3");
-        this.load.audio("heal", "health_up.ogg");
-        this.load.audio("death", "death.mp3");
-        this.load.audio("unlock", "unlock.mp3");
-        this.load.audio("win", "win.mp3");
-        this.load.audio("enemyHurt", "enemy_damage.mp3");
-        this.load.audio("enemyDeath", "enemy_death.mp3");
-        this.load.audio("keyDrop", "key_drop.mp3");
-        this.load.audio("select_1", "select_1.mp3");
-        this.load.audio("select_2", "select_2.mp3");*/
+        // Load audio
+
     }
 
     create() {

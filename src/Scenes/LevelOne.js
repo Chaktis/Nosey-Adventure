@@ -58,6 +58,7 @@ class LevelOne extends Phaser.Scene{
         // Add a tileset to the map
         const oneBit = this.map.addTilesetImage("black_tile", "black_tile");
         const oneBitTransparent = this.map.addTilesetImage("1-bit-transparent", "monochrome_tilemap_transparent");
+        const oneBitCrystal = this.map.addTilesetImage("crystal_tilemap", "crystal_tilemap");
         const tilesets = [oneBit, oneBitTransparent];
 
 

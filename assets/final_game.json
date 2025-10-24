@@ -551,6 +551,185 @@
         }, 
         {
          "draworder":"topdown",
+         "id":12,
+         "name":"EnemySpawns",
+         "objects":[
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":963,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":848,
+                 "y":1328
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":964,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1280,
+                 "y":1792
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":965,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1440,
+                 "y":1440
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":966,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":2096,
+                 "y":1888
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":967,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1664,
+                 "y":544
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":968,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":400,
+                 "y":736
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":969,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":128,
+                 "y":832
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":970,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":224,
+                 "y":1664
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":971,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":416,
+                 "y":1584
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":972,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":2032,
+                 "y":160
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":973,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":2288,
+                 "y":160
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":974,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1936,
+                 "y":448
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":975,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":2256,
+                 "y":544
+                }, 
+                {
+                 "gid":247,
+                 "height":16,
+                 "id":976,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1872,
+                 "y":832
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":7,
          "name":"Spikes",
          "objects":[
@@ -4409,8 +4588,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":12,
- "nextobjectid":963,
+ "nextlayerid":13,
+ "nextobjectid":977,
  "orientation":"orthogonal",
  "properties":[
         {
@@ -4727,6 +4906,19 @@
                          "value":true
                         }]
                 }],
+         "tilewidth":16
+        }, 
+        {
+         "columns":16,
+         "firstgid":402,
+         "image":"crystal_tilemap.png",
+         "imageheight":176,
+         "imagewidth":256,
+         "margin":0,
+         "name":"crystal_tilemap",
+         "spacing":0,
+         "tilecount":176,
+         "tileheight":16,
          "tilewidth":16
         }],
  "tilewidth":16,
