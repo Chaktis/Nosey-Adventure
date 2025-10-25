@@ -17,8 +17,12 @@ class Load extends Phaser.Scene {
         this.load.image('coin', 'coin.png')
         this.load.image('key', 'key.png') 
 
-        // Load spritesheets
+        // Load animation spritesheets
         this.load.spritesheet('characters', 'monochrome_tilemap_transparent_packed.png', {
+            frameWidth: 16,  
+            frameHeight: 16
+        });
+        this.load.spritesheet('enemies', 'PlaceholderEnemySprites.png', {
             frameWidth: 16,  
             frameHeight: 16
         });
@@ -27,8 +31,8 @@ class Load extends Phaser.Scene {
             frameHeight: 16
         });
         
-        // Packed tilemap
-        this.load.tilemapTiledJSON("level-one", "final_game.json");   // Tilemap in JSON
+        // Packed tilemap level
+        this.load.tilemapTiledJSON("level-one", "final_game.json");
 
         // Load audio
         this.load.audio("pickupCoin", "pickupCoin.wav");
@@ -41,7 +45,7 @@ class Load extends Phaser.Scene {
 
     create() {
     
-        // ANIMATIONS
+        //// PLAYER ANIMATIONS ////
         this.anims.create({
             key: 'walk',
             frames: [
@@ -59,7 +63,6 @@ class Load extends Phaser.Scene {
         this.anims.create({
             key: 'idle',
             frames: [
-                //{key: 'characters', frame: 260},
                 {key: 'characters', frame: 240}
             ],
             frameRate: 1,
@@ -78,9 +81,48 @@ class Load extends Phaser.Scene {
 
         
 
+        //// ENEMY ANIMATIONS ////
+
+        // Ground Enemy
+        this.anims.create({
+            key: 'groundIdle',
+            frames: [
+                {key: 'enemies', frame: 3}
+            ],
+            frameRate: 8,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'groundDie',
+            frames: [
+                {key: 'enemies', frame: 11}
+            ],
+            frameRate: 8,
+            repeat: -1
+        });
 
 
-         // Start level scene
-         this.scene.start("LevelOne");
+        // Flying Enemy
+        this.anims.create({
+            key: 'flyingIdle',
+            frames: [
+                {key: 'enemies', frame: 8}
+            ],
+            frameRate: 8,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'flyingDie',
+            frames: [
+                {key: 'enemies', frame: 11}
+            ],
+            frameRate: 8,
+            repeat: -1
+        });
+
+        // Start level scene
+        this.scene.start("LevelOne");
     }
 }

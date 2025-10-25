@@ -15,7 +15,7 @@ class LevelOne extends Phaser.Scene{
         this.physics.world.gravity.y = 1000;
 
         // turn off debug
-        this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
+        //this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
 
         // COUNTERS
         this.coinCount = 0;
@@ -59,7 +59,7 @@ class LevelOne extends Phaser.Scene{
         const oneBit = this.map.addTilesetImage("black_tile", "black_tile");
         const oneBitTransparent = this.map.addTilesetImage("1-bit-transparent", "monochrome_tilemap_transparent");
         const oneBitCrystal = this.map.addTilesetImage("crystal_tilemap", "crystal_tilemap");
-        const tilesets = [oneBit, oneBitTransparent];
+        const tilesets = [oneBit, oneBitTransparent, oneBitCrystal];
 
 
         // LAYER SETUP
@@ -93,10 +93,28 @@ class LevelOne extends Phaser.Scene{
         this.player.body.checkCollision.left = true;
         this.player.body.checkCollision.right = true;
 
+        // ENEMY SETUP
+        this.enemies = this.physics.add.group();
 
-        // LAYER COLLISIONS
-        this.physics.add.collider(this.player, this.collisionLayer);
-    
+        // Get point objects from "EnemySpawns" layer in Tiled
+        const enemySpawnObjects = this.map.getObjectLayer('EnemySpawns').objects;
+
+        enemySpawnObjects.forEach((obj) => {
+            // Use Tiled Class property
+            const enemyType = obj.class || 'groundEnemy'; // default to shell if empty
+
+            let enemy;
+            if (enemyType === 'flyingEnemy') {
+                enemy = new FlyingEnemy(this, obj.x * 2, obj.y * 2, 'flyingEnemy', 50);
+            } else {
+                enemy = new GroundEnemy(this, obj.x * 2, obj.y * 2, 'groundEnemy', 50);
+            }
+
+            enemy.setScale(2);
+            this.enemies.add(enemy);
+        });
+
+
         // PHYSICS GROUPS
         this.spikeGroup = this.physics.add.staticGroup();
         this.lockGroup = this.physics.add.staticGroup();
@@ -104,9 +122,15 @@ class LevelOne extends Phaser.Scene{
         this.keyGroup = this.physics.add.staticGroup();
         this.doorGroup = this.physics.add.staticGroup();
 
+        // LAYER COLLISIONS
+        this.physics.add.collider(this.player, this.collisionLayer);
+        this.physics.add.collider(this.enemies, this.collisionLayer);
+
+
 
         /////////////// ***OBJECT CREATION*** ///////////////
 
+    
         // DOOR OBJECT
         const doorObject = this.map.getObjectLayer('Exit').objects;
         doorObject.forEach(obj => {
@@ -334,6 +358,7 @@ class LevelOne extends Phaser.Scene{
             this.playerTakeDamage();
         });
 
+        
         // PLAYER COLLISION WITH ENEMIES
         this.physics.add.overlap(this.player, this.enemies, (player, enemy) => {
             if (enemy.alive) {
@@ -402,6 +427,13 @@ class LevelOne extends Phaser.Scene{
 
         const cam = this.cameras.main;
 
+        // have to put update for each class since Phaser doesn't do it automatically :/
+        this.enemies.children.iterate(enemy => {
+            if (enemy && enemy.update) {
+                enemy.update();
+            }
+        });
+
         // PLAYER MOVEMENT
         if (this.inputEnabled) {
             // First, handle movement
@@ -432,7 +464,7 @@ class LevelOne extends Phaser.Scene{
             if (this.player.body.blocked.down && (Phaser.Input.Keyboard.JustDown(this.cursors.up) || Phaser.Input.Keyboard.JustDown(this.keys.W) || Phaser.Input.Keyboard.JustDown(this.spaceKey))) {
                 this.player.setVelocityY(this.JUMP_VELOCITY);
                 this.sound.play("jump", {
-                        volume: 0.5,
+                        volume: 0.4,
                         rate: Phaser.Math.FloatBetween(0.95, 1.15)
                     });
             }
