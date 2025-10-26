@@ -98,20 +98,28 @@ class LevelOne extends Phaser.Scene{
 
         // Get point objects from "EnemySpawns" layer in Tiled
         const enemySpawnObjects = this.map.getObjectLayer('EnemySpawns').objects;
-
+        
+        let flyingEnemy = new FlyingEnemy(this, 2800, 1000, 50);
+        flyingEnemy.setScale(2);
+        this.enemies.add(flyingEnemy);
+        
         enemySpawnObjects.forEach((obj) => {
+
             // Use Tiled Class property
-            const enemyType = obj.class || 'groundEnemy'; // default to shell if empty
+            const enemyType = obj.type || 'groundEnemy'; // default value is ground enemy
 
             let enemy;
             if (enemyType === 'flyingEnemy') {
-                enemy = new FlyingEnemy(this, obj.x * 2, obj.y * 2, 'flyingEnemy', 50);
-            } else {
-                enemy = new GroundEnemy(this, obj.x * 2, obj.y * 2, 'groundEnemy', 50);
+                enemy = new FlyingEnemy(this, obj.x * 2, obj.y * 2, 50);
+            } 
+            else {
+                enemy = new GroundEnemy(this, obj.x * 2, obj.y * 2, 50);
             }
 
             enemy.setScale(2);
             this.enemies.add(enemy);
+
+            console.log(obj);
         });
 
 

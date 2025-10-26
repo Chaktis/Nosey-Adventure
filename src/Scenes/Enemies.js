@@ -1,7 +1,7 @@
 class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-    constructor(scene, x, y, texture, patrolDistance) {
-        super(scene, x, y, texture);
+    constructor(scene, x, y, patrolDistance) {
+        super(scene, x, y);
         this.scene = scene;
         
 
@@ -24,8 +24,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
 class GroundEnemy extends Enemy {
     
-    constructor(scene, x, y, texture, patrolDistance) {
-        super(scene, x, y, texture, patrolDistance);
+    constructor(scene, x, y, patrolDistance) {
+        super(scene, x, y, patrolDistance);
         this.speed = 50;
 
         this.body.setSize(16, 16);
@@ -91,8 +91,8 @@ class GroundEnemy extends Enemy {
 
 class FlyingEnemy extends Enemy {
 
-    constructor(scene, x, y, texture, patrolDistance) {
-        super(scene, x, y, texture, patrolDistance);
+    constructor(scene, x, y, patrolDistance) {
+        super(scene, x, y, patrolDistance);
         this.speed = 50;
 
         this.body.setSize(16, 16);
