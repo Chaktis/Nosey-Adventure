@@ -6,12 +6,6 @@ class LevelOne extends Phaser.Scene{
 
     init() {
 
-        // PLAYER JUMP VALUES
-        this.ACCELERATION = 1000;
-        this.MAX_VELOCITY = 170;
-        this.DRAG = 6000;
-        this.AIR_DRAG = 10000;
-        this.JUMP_VELOCITY = -500;
         this.physics.world.gravity.y = 1000;
 
         // turn off debug
@@ -19,10 +13,8 @@ class LevelOne extends Phaser.Scene{
 
         // COUNTERS
         this.coinCount = 0;
-        this.health = 3;
         this.keysCollected = 0;
         this.enemiesKilled = 0;
-        this.playerAlive = true;
         this.gameOver = false
 
         // stores locks that will be unlocked once player gets near
@@ -37,18 +29,18 @@ class LevelOne extends Phaser.Scene{
     create() {
 
         // KEYBOARD INPUT
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.keys = this.input.keyboard.addKeys("W,S,A,D");
-        this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-        this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-        this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-        this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-
-        // FLAGS
-        this.inputEnabled = true; // disables user input
-        this.canTakeDamage = true;
-        this.damageCooldown = 5000; // 1 second
+        this.inputKeys = {
+            cursors: this.input.keyboard.createCursorKeys(),
+            keys: this.input.keyboard.addKeys({
+                W: Phaser.Input.Keyboard.KeyCodes.W,
+                A: Phaser.Input.Keyboard.KeyCodes.A,
+                S: Phaser.Input.Keyboard.KeyCodes.S,
+                D: Phaser.Input.Keyboard.KeyCodes.D
+            }),
+            spaceKey: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
+            keyS: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S)
+        };
+        this.inputEnabled = true; // disables/enables user input
 
 
         // TILEMAP SETUP
@@ -83,25 +75,14 @@ class LevelOne extends Phaser.Scene{
 
 
         // PLAYER SETUP
-        this.player = this.physics.add.sprite(2750, 10, "characters", 240);
+        this.player = new Player(this, 2750, 10, "characters", 240, this.inputKeys);
         this.player.setCollideWorldBounds(true);
-        this.player.setScale(1.8);
-        this.player.setOrigin(0, 0);
-
-        this.player.body.checkCollision.up = true;
-        this.player.body.checkCollision.down = true;
-        this.player.body.checkCollision.left = true;
-        this.player.body.checkCollision.right = true;
 
         // ENEMY SETUP
         this.enemies = this.physics.add.group();
 
         // Get point objects from "EnemySpawns" layer in Tiled
         const enemySpawnObjects = this.map.getObjectLayer('EnemySpawns').objects;
-        
-        let flyingEnemy = new FlyingEnemy(this, 2800, 1000, 50);
-        flyingEnemy.setScale(2);
-        this.enemies.add(flyingEnemy);
         
         enemySpawnObjects.forEach((obj) => {
 
@@ -138,7 +119,6 @@ class LevelOne extends Phaser.Scene{
 
         /////////////// ***OBJECT CREATION*** ///////////////
 
-    
         // DOOR OBJECT
         const doorObject = this.map.getObjectLayer('Exit').objects;
         doorObject.forEach(obj => {
@@ -323,16 +303,17 @@ class LevelOne extends Phaser.Scene{
             key.y *= 2;
             key.alpha = 1.0;
             this.keyGroup.add(key);
-        });/*
+        });
+
 
 
         /////////////// *** COLLISION DETECTION*** ///////////////
 
-        */// PLAYER COLLISION WITH LOCKS
+        // PLAYER COLLISION WITH LOCKS
         this.physics.add.collider(this.player, this.lockGroup);
 
+
         // PLAYER COLLISION WITH KEYS
-        //this.physics.add.collider(this.keyGroup, this.groundLayer);
         this.physics.add.overlap(this.player, this.keyGroup, (player, key) => {
             key.destroy();
             this.keysCollected++;
@@ -343,34 +324,34 @@ class LevelOne extends Phaser.Scene{
 
 
         // PLAYER COLLISION WITH COINS
-        this.physics.add.overlap(this.player, this.coinGroup, (obj1, obj2) => {
+        this.physics.add.overlap(this.player, this.coinGroup, (player, coin) => {
             //trigger particle effect
-            this.coinCollectParticles.explode(10, obj2.x, obj2.y);
+            this.coinCollectParticles.explode(10, coin.x, coin.y);
 
             // remove coin on overlap
-            obj2.destroy(); 
+            coin.destroy(); 
             this.coinCount++;
             this.coinScore.setText('x ' + this.coinCount);
             this.sound.play("pickupCoin", { volume: 0.5 });
 
             // Add health for every 10 coins collected
             if (this.coinCount % 10 == 0) {
-                this.health++;
-                this.healthCounter.setText('x ' + this.health);
+                this.player.health++;
+                this.healthCounter.setText('x ' + this.player.health);
             }
         })
 
 
         // PLAYER COLLISION WITH SPIKES
         this.physics.add.overlap(this.player, this.spikeGroup, () => {
-            this.playerTakeDamage();
+            this.player.playerTakeDamage();
         });
 
         
         // PLAYER COLLISION WITH ENEMIES
         this.physics.add.overlap(this.player, this.enemies, (player, enemy) => {
             if (enemy.alive) {
-                this.playerTakeDamage();
+                player.playerTakeDamage();
             }
         });
         
@@ -379,7 +360,10 @@ class LevelOne extends Phaser.Scene{
             this.showWinScreen();
         });
         
-        /////////////// *** COLLISION DETECTION END *** ///////////////
+
+
+
+        /////////////// ***UI ELEMENTS *** ///////////////
 
         // COIN UI
         this.coin = this.add.image(250, 300, 'coin').setScrollFactor(0).setScale(2);
@@ -392,7 +376,7 @@ class LevelOne extends Phaser.Scene{
         
         // HEALTH UI
         this.heart = this.add.image(250, 340, 'heart').setScrollFactor(0).setScale(2);
-        this.healthCounter = this.add.text(this.cameras.main.centerX - 150, this.cameras.main.centerY - 197, 'x ' + this.health, {
+        this.healthCounter = this.add.text(this.cameras.main.centerX - 150, this.cameras.main.centerY - 197, 'x ' + this.player.health, {
             fontFamily: 'Alagard',
             fontSize: '16px',
             color: '#ffffff'
@@ -425,89 +409,22 @@ class LevelOne extends Phaser.Scene{
                 this.isHurt = false;
                 this.scene.restart();
             }
-        });
-
-
-        
+        });  
     }
 
     update() {
 
         const cam = this.cameras.main;
 
-        // have to put update for each class since Phaser doesn't do it automatically :/
+        // UPDATE ENEMIES
         this.enemies.children.iterate(enemy => {
             if (enemy && enemy.update) {
                 enemy.update();
             }
         });
 
-        // PLAYER MOVEMENT
-        if (this.inputEnabled) {
-            // First, handle movement
-            if (this.cursors.left.isDown || this.keys.A.isDown) {
-                this.player.setAccelerationX(-this.ACCELERATION);
-                this.player.setFlip(true, false);
-                this.cameras.main.followOffset.set(100, 50);
-            } else if (this.cursors.right.isDown || this.keys.D.isDown) {
-                this.cameras.main.followOffset.set(-100, 50);
-                this.player.setAccelerationX(this.ACCELERATION);
-                this.player.resetFlip();
-            } else {
-                this.player.setAccelerationX(0);
-            }
-
-            // Apply max speed
-            if (Math.abs(this.player.body.velocity.x) > this.MAX_VELOCITY) {
-                this.player.setVelocityX(Phaser.Math.Clamp(this.player.body.velocity.x, -this.MAX_VELOCITY, this.MAX_VELOCITY));
-            }
-
-            // Grounded drag
-            this.player.setDragX(this.player.body.blocked.down ? this.DRAG : this.AIR_DRAG);
-
-            // Gravity
-            //this.player.setGravityY(!this.player.body.blocked.down && this.player.body.velocity.y > 0 ? this.physics.world.gravity.y : 0);
-
-            // Handle jumping input
-            if (this.player.body.blocked.down && (Phaser.Input.Keyboard.JustDown(this.cursors.up) || Phaser.Input.Keyboard.JustDown(this.keys.W) || Phaser.Input.Keyboard.JustDown(this.spaceKey))) {
-                this.player.setVelocityY(this.JUMP_VELOCITY);
-                this.sound.play("jump", {
-                        volume: 0.4,
-                        rate: Phaser.Math.FloatBetween(0.95, 1.15)
-                    });
-            }
-
-            //#################################################################
-            // TODO: MAKE AN ACTUAL JUMPING STATE
-            // JUMP FRAME CONTROL
-            if ((!this.player.body.blocked.down) /*&& (!this.gunActive)*/) {
-                // In air
-                if (this.player.body.velocity.x > 10) {
-                    // Jumping right
-                    this.player.setFrame(242);
-                    this.player.resetFlip(); // facing right
-                } else if (this.player.body.velocity.x < -10) {
-                    // Jumping left
-                    this.player.setFrame(242);
-                    this.player.setFlip(true, false); // facing left
-                } else {
-                    // Jumping straight up
-                    this.player.setFrame(242);
-                }
-
-            } else {
-                // On ground - play walk/idle animations
-                if (!this.isHurt) {
-                    if (this.player.body.velocity.x !== 0) {
-                        this.player.anims.play('walk', true);
-                    } else {
-                        this.player.anims.play('idle', true);
-                    }
-                }
-            }
-        }
-        else this.player.setVelocityX(0);
-
+        // UPDATE PLAYER
+        this.player.update()
 
         // Check for nearby pending locks to unlock
         this.pendingUnlocks = this.pendingUnlocks.filter(lock => {
@@ -525,11 +442,12 @@ class LevelOne extends Phaser.Scene{
         });
 
         // LOSE CONDITIONS
-        if (this.health <= 0) {
-            this.playerAlive = false;
+        if (this.player.health <= 0) {
+            this.player.playerAlive = false;
             this.endScreen();
         }
     }
+
 
 
     // Makes the locks disappear as the player collects the keys
@@ -544,26 +462,6 @@ class LevelOne extends Phaser.Scene{
     }
 
 
-    playerTakeDamage() {
-        if (this.canTakeDamage) {
-            if (this.playerAlive){
-                this.health--;
-                this.healthCounter.setText('x ' + this.health);
-
-                this.canTakeDamage = false;
-                this.isHurt = true;
-                this.player.anims.stop();
-                this.player.anims.play('hurt', true);
-                this.sound.play("hurt", { volume: 0.5 });
-
-                // Reset flag after a delay
-                this.time.delayedCall(this.damageCooldown, () => {
-                    this.canTakeDamage = true;
-                    this.isHurt = false;
-                });
-            }
-        }
-    }
 
     endScreen() {
         // prevent repeat triggers

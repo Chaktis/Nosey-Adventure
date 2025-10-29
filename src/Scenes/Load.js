@@ -22,8 +22,12 @@ class Load extends Phaser.Scene {
             frameWidth: 16,  
             frameHeight: 16
         });
-        this.load.spritesheet('enemies', 'PlaceholderEnemySprites.png', {
+        this.load.spritesheet('enemies', 'enemies.png', {
             frameWidth: 16,  
+            frameHeight: 16
+        });
+        this.load.spritesheet('nosebat', 'nosebat.png', {
+            frameWidth: 22,  
             frameHeight: 16
         });
         this.load.spritesheet('monochrome_tilemap_spritesheet', 'monochrome_tilemap_transparent_packed.png', {
@@ -70,6 +74,16 @@ class Load extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'attack',
+            frames: [
+                {key: 'characters', frame: 280},
+                {key: 'characters', frame: 281}
+            ],
+            frameRate: 8,
+            repeat: 0
+        });
+
+        this.anims.create({
             key: 'hurt',
             frames: [
                 {key: 'characters', frame: 0},
@@ -87,7 +101,12 @@ class Load extends Phaser.Scene {
         this.anims.create({
             key: 'groundIdle',
             frames: [
-                {key: 'enemies', frame: 3}
+                {key: 'enemies', frame: 4},
+                {key: 'enemies', frame: 5},
+                {key: 'enemies', frame: 6},
+                {key: 'enemies', frame: 7},
+                {key: 'enemies', frame: 8},
+                {key: 'enemies', frame: 9}
             ],
             frameRate: 8,
             repeat: -1
@@ -96,7 +115,7 @@ class Load extends Phaser.Scene {
         this.anims.create({
             key: 'groundDie',
             frames: [
-                {key: 'enemies', frame: 11}
+                {key: 'enemies', frame: 20}
             ],
             frameRate: 8,
             repeat: -1
@@ -107,16 +126,20 @@ class Load extends Phaser.Scene {
         this.anims.create({
             key: 'flyingIdle',
             frames: [
-                {key: 'enemies', frame: 8}
+                {key: 'nosebat', frame: 0},
+                {key: 'nosebat', frame: 1},
+                {key: 'nosebat', frame: 2},
+                {key: 'nosebat', frame: 3},
+                {key: 'nosebat', frame: 4}
             ],
-            frameRate: 8,
+            frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
             key: 'flyingDie',
             frames: [
-                {key: 'enemies', frame: 11}
+                {key: 'enemies', frame: 5}
             ],
             frameRate: 8,
             repeat: -1

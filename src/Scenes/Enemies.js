@@ -18,7 +18,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         // PHYSICS
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        //this.setCollideWorldBounds(true);
     }
 }
 
@@ -28,6 +27,7 @@ class GroundEnemy extends Enemy {
         super(scene, x, y, patrolDistance);
         this.speed = 50;
 
+        // Enemy Hitbox
         this.body.setSize(16, 16);
         this.body.setOffset(0, 0);
     }
@@ -95,8 +95,10 @@ class FlyingEnemy extends Enemy {
         super(scene, x, y, patrolDistance);
         this.speed = 50;
 
-        this.body.setSize(16, 16);
-        this.body.setOffset(0, 0);
+
+        // Enemy Hitbox
+        this.body.setSize(12, 12);
+        this.body.setOffset(5, 1.5);
     }
 
     update() {
