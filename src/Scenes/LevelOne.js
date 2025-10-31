@@ -6,7 +6,7 @@ class LevelOne extends Phaser.Scene{
 
     init() {
 
-        this.physics.world.gravity.y = 1000;
+        this.physics.world.gravity.y = 950;
 
         // turn off debug
         //this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
@@ -114,6 +114,7 @@ class LevelOne extends Phaser.Scene{
         // LAYER COLLISIONS
         this.physics.add.collider(this.player, this.collisionLayer);
         this.physics.add.collider(this.enemies, this.collisionLayer);
+        
 
 
 
@@ -354,6 +355,14 @@ class LevelOne extends Phaser.Scene{
                 player.playerTakeDamage();
             }
         });
+
+        // PLAYER ATTACKING ENEMIES
+        this.physics.add.overlap(this.player.attackHitbox, this.enemies, (hitbox, enemy) => {
+            if (this.player.isAttacking && hitbox.active) {
+                enemy.takeDamage();
+            }
+        });
+
         
         // PLAYER COLLISION WITH EXIT DOOR
         this.physics.add.overlap(this.player, this.doorGroup, () => {

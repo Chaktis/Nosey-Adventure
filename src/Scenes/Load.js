@@ -74,10 +74,29 @@ class Load extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'jump',
+            frames: [
+                {key: 'characters', frame: 242}
+            ],
+            frameRate: 1,
+            repeat: -1
+        });
+
+        this.anims.create({
             key: 'attack',
             frames: [
                 {key: 'characters', frame: 280},
                 {key: 'characters', frame: 281}
+            ],
+            frameRate: 8,
+            repeat: 0
+        });
+
+        this.anims.create({
+            key: 'slash',
+            frames: [
+                {key: 'characters', frame: 247},
+                {key: 'characters', frame: 248}
             ],
             frameRate: 8,
             repeat: 0
@@ -115,7 +134,7 @@ class Load extends Phaser.Scene {
         this.anims.create({
             key: 'groundDie',
             frames: [
-                {key: 'enemies', frame: 20}
+                {key: 'enemies', frame: 21}
             ],
             frameRate: 8,
             repeat: -1
@@ -139,7 +158,7 @@ class Load extends Phaser.Scene {
         this.anims.create({
             key: 'flyingDie',
             frames: [
-                {key: 'enemies', frame: 5}
+                {key: 'enemies', frame: 21}
             ],
             frameRate: 8,
             repeat: -1

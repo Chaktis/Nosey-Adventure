@@ -12,8 +12,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.direction = 1;  // 1 = right, -1 = left
 
         // STATUS FLAGS
-        this.health = 500;
+        this.health = 100;
         this.alive = true;
+        this.damageCooldown = 300;
+        this.canTakeDamage = true;
 
         // PHYSICS
         scene.add.existing(this);
@@ -25,7 +27,9 @@ class GroundEnemy extends Enemy {
     
     constructor(scene, x, y, patrolDistance) {
         super(scene, x, y, patrolDistance);
+
         this.speed = 50;
+        this.health = 400;
 
         // Enemy Hitbox
         this.body.setSize(16, 16);
@@ -58,12 +62,19 @@ class GroundEnemy extends Enemy {
 
     takeDamage() {
 
-        // If the enemy isn't alive, return
-        if (!this.alive) return;
+        // If the enemy isn't alive or can't take damage, don't trigger
+        if (!this.alive || !this.canTakeDamage) return;
 
         // Reduce health + play sound
         this.health -= 100;
         this.scene.sound.play("enemyHurt", {volume: 0.5});
+
+        this.canTakeDamage = false
+
+        // Reset flag after a delay
+        this.scene.time.delayedCall(this.damageCooldown, () => {
+            this.canTakeDamage = true;
+        });
 
         // Delete the enemy once it's dead
         if (this.health <= 0) {
@@ -93,7 +104,9 @@ class FlyingEnemy extends Enemy {
 
     constructor(scene, x, y, patrolDistance) {
         super(scene, x, y, patrolDistance);
+
         this.speed = 50;
+        this.health = 200;
 
 
         // Enemy Hitbox
@@ -125,12 +138,19 @@ class FlyingEnemy extends Enemy {
 
     takeDamage() {
 
-        // If the enemy isn't alive, return
-        if (!this.alive) return;
+        /// If the enemy isn't alive or can't take damage, don't trigger
+        if (!this.alive || !this.canTakeDamage) return;
 
         // Reduce health + play sound
         this.health -= 100;
         this.scene.sound.play("enemyHurt", {volume: 0.5});
+
+        this.canTakeDamage = false
+
+        // Reset flag after a delay
+        this.scene.time.delayedCall(this.damageCooldown, () => {
+            this.canTakeDamage = true;
+        });
 
         // Delete the enemy once it's dead
         if (this.health <= 0) {

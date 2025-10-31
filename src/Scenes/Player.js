@@ -24,7 +24,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         // PLAYER SETUP
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        this.setScale(1.8);
+        this.setScale(2);
         this.setOrigin(0, 0);
         this.body.setSize(10, 13);
         this.body.setOffset(3, 3);
@@ -34,18 +34,26 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.body.checkCollision.left = true;
         this.body.checkCollision.right = true;
 
+
+        // SWORD ATTACK SETUP (basically invisible hitbox that gets enabled/disabled)
+        this.attackHitbox = scene.add.rectangle(0, 0, 38, 28, 0xff0000, 0);
+        scene.physics.add.existing(this.attackHitbox);
+        this.attackHitbox.body.allowGravity = false;
+        this.attackHitbox.active = false; // starts inactive
+
         // FLAGS
         this.playerAlive = true;
         this.canTakeDamage = true;
+        this.canAttack = true
         this.isAttacking = false;
-        this.damageCooldown = 5000; // 1 second
+        this.attackCooldown = 450;
+        this.damageCooldown = 5000; 
     }
 
 
     update() {
         // PLAYER MOVEMENT
         if (this.scene.inputEnabled) {
-            // First, handle movement
             if (this.inputKeys.cursors.left.isDown || this.inputKeys.keys.A.isDown) {
                 this.setAccelerationX(-this.ACCELERATION);
                 this.setFlip(true, false);
@@ -53,65 +61,69 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             } else if (this.inputKeys.cursors.right.isDown || this.inputKeys.keys.D.isDown) {
                 this.scene.cameras.main.followOffset.set(-100, 50);
                 this.setAccelerationX(this.ACCELERATION);
-                this.resetFlip();
+                this.resetFlip(); 
             } else {
                 this.setAccelerationX(0);
             }
 
-            // Apply max speed
+
+            // Apply speed limits
             if (Math.abs(this.body.velocity.x) > this.MAX_VELOCITY) {
                 this.setVelocityX(Phaser.Math.Clamp(this.body.velocity.x, -this.MAX_VELOCITY, this.MAX_VELOCITY));
             }
 
-            // Cap falling speed
             if (this.body.velocity.y > this.MAX_FALLING_VELOCITY) {
                 this.setVelocityY(this.MAX_FALLING_VELOCITY);
             }
+
 
             // Grounded drag
             this.setDragX(this.body.blocked.down ? this.DRAG : this.AIR_DRAG);
 
 
             // Jumping input
-            if (this.body.blocked.down && (this.inputKeys.cursors.up.isDown || this.inputKeys.keys.W.isDown || this.inputKeys.spaceKey.isDown)) {
-                this.setVelocityY(this.JUMP_VELOCITY);
-                this.scene.sound.play("jump", {
-                        volume: 0.4,
-                        rate: Phaser.Math.FloatBetween(0.95, 1.15)
-                    });
+            if (this.body.blocked.down && (
+                Phaser.Input.Keyboard.JustDown(this.inputKeys.cursors.up) || 
+                Phaser.Input.Keyboard.JustDown(this.inputKeys.keys.W) || 
+                Phaser.Input.Keyboard.JustDown(this.inputKeys.spaceKey)
+            )) {
+                this.jump();
             }
 
-            //#################################################################
-            // TODO: MAKE AN ACTUAL JUMPING STATE
-            // JUMP FRAME CONTROL
-            if ((!this.body.blocked.down)) {
-                // In air
-                if (this.body.velocity.x > 10) {
-                    // Jumping right
-                    this.setFrame(242);
-                    this.resetFlip(); // facing right
-                } else if (this.body.velocity.x < -10) {
-                    // Jumping left
-                    this.setFrame(242);
-                    this.setFlip(true, false); // facing left
-                } else {
-                    // Jumping straight up
-                    this.setFrame(242);
-                }
 
             // Attacking Input
-            if (this.inputKeys.cursors.down.isDown || this.inputKeys.keys.S.isDown) {
+            if (!this.isAttacking && 
+                this.canAttack && 
+                (Phaser.Input.Keyboard.JustDown(this.inputKeys.cursors.down) || 
+                Phaser.Input.Keyboard.JustDown(this.inputKeys.keys.S))
+            ){
                 this.attack();
             }
 
-            
-            } else {
-                // On ground - play walk/idle animations
-                if (!this.isHurt) {
-                    if (this.body.velocity.x !== 0) {
-                        this.anims.play('walk', true);
-                    } else {
-                        this.anims.play('idle', true);
+            // Move slash with player
+            if (this.isAttacking && this.slashSprite) {
+                const facingLeft = this.flipX;
+                const offsetX = facingLeft ? -Math.abs(this.attackOffset.x) : Math.abs(this.attackOffset.x);
+                const offsetY = this.attackOffset.y;
+
+                
+                this.slashSprite.setPosition(this.x + offsetX, this.y + offsetY);
+                this.attackHitbox.setPosition(this.x + offsetX, this.y + offsetY);
+            }
+
+
+            // Animation logic
+            else {
+                if (!this.isAttacking && !this.isHurt) { // If player isn't attacking or hurt
+                    if (!this.body.blocked.down && this.anims.currentAnim?.key !== 'jump') {
+                            this.anims.play('jump'); // Need this to be separate from jumping function, since otherwise it will be overridden
+                    } 
+                    else if (this.body.blocked.down) {
+                        if (this.body.velocity.x !== 0) {
+                            this.anims.play('walk', true);
+                        } else {
+                            this.anims.play('idle', true);
+                        }
                     }
                 }
             }
@@ -121,10 +133,60 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     }
 
+    jump(){
+        this.setVelocityY(this.JUMP_VELOCITY);
+        this.scene.sound.play("jump", {
+            volume: 0.4,
+            rate: Phaser.Math.FloatBetween(0.95, 1.15)
+        });
+
+    }
+
 
 
     attack(){
+        this.isAttacking = true;
+        this.canAttack = false;
+        this.attackHitbox.active = true;
         this.anims.play('attack', true);
+
+        // Slash hitbox/animation offset
+        const facingLeft = this.flipX;
+        const offsetX = facingLeft ? -16 : 48; // Change x position offset depending on which direction player is facing
+        const offsetY = 16;
+
+        // Store offsets to use in repositioning slash
+        this.attackOffset = {x: offsetX, y: offsetY};
+
+        // Create slash sprite
+        this.slashSprite = this.scene.add.sprite(this.x + offsetX, this.y + offsetY, 'slash');
+        this.slashSprite.setFlipX(facingLeft);
+        this.slashSprite.setScale(2);
+        this.slashSprite.play('slash');
+
+        // Enable slash hitbox
+        this.attackHitbox.setPosition(this.x + offsetX, this.y + offsetY);
+        this.attackHitbox.body.enable = true;
+        this.attackHitbox.active = true;
+
+        // Remove slash after animation completes
+        this.slashSprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+            this.slashSprite.destroy();
+            this.attackHitbox.active = false;
+        });
+
+        // Reset attacking flag once animation completes
+        this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, (anim) => {
+            if (anim.key === 'attack') {
+                this.isAttacking = false;
+            }
+        });
+
+        // Reset flag after a delay
+                this.scene.time.delayedCall(this.attackCooldown, () => {
+                    this.canAttack = true;
+                });
+
     }
 
 
