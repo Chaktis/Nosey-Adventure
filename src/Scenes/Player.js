@@ -9,7 +9,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.inputKeys = input
 
         // COUNTERS
-        this.health = 3;
+        this.health = 4;
     
 
         // PLAYER JUMP VALUES

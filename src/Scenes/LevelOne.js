@@ -463,12 +463,10 @@ class LevelOne extends Phaser.Scene{
 
     // Makes the locks disappear as the player collects the keys
     unlockNextLock() {
-        if (this.keysCollected <= this.lockArray.length) {
             const lockToUnlock = this.lockArray[this.lockArray.length - this.keysCollected]; // reverse order
             if (lockToUnlock) {
             // Queue it for unlocking when the player gets close
             this.pendingUnlocks.push(lockToUnlock);
-            }
         }  
     }
 
