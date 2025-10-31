@@ -9,7 +9,7 @@ class LevelOne extends Phaser.Scene{
         this.physics.world.gravity.y = 950;
 
         // turn off debug
-        //this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
+        this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
 
         // COUNTERS
         this.coinCount = 0;
@@ -445,6 +445,8 @@ class LevelOne extends Phaser.Scene{
             if (distance < 200) { // can adjust proximity
                 this.lockGroup.remove(lock, true, true); // remove from pendingUnlocks
                 this.coinCollectParticles.explode(10, lock.x + 18, lock.y - 20);
+                this.keysCollected--;
+                this.keyCount.setText('x ' + this.keysCollected);
                 return false; 
             }
             return true; // don't remove if still too far

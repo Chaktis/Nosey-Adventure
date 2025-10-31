@@ -191,23 +191,28 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
 
     playerTakeDamage() {
-        if (this.canTakeDamage) {
-            if (this.playerAlive){
-                this.health--;
-                this.scene.healthCounter.setText('x ' + this.health);
+        if (this.canTakeDamage && this.playerAlive) {
+            this.health--;
+            this.scene.healthCounter.setText('x ' + this.health);
 
-                this.canTakeDamage = false;
-                this.isHurt = true;
-                this.anims.stop();
-                this.anims.play('hurt', true);
-                this.scene.sound.play("hurt", { volume: 0.5 });
-
-                // Reset flag after a delay
-                this.scene.time.delayedCall(this.damageCooldown, () => {
-                    this.canTakeDamage = true;
-                    this.isHurt = false;
-                });
+            // Cancel any current attack when hit
+            this.isAttacking = false;
+            this.canAttack = true;
+            if (this.slashSprite) {
+                this.slashSprite.destroy();
+                this.attackHitbox.active = false;
             }
+
+            this.canTakeDamage = false;
+            this.isHurt = true;
+            this.anims.play('hurt', true);
+            this.scene.sound.play("hurt", { volume: 0.5 });
+
+            // Reset flag after a delay
+            this.scene.time.delayedCall(this.damageCooldown, () => {
+                this.canTakeDamage = true;
+                this.isHurt = false;
+            });
         }
     }
 }
