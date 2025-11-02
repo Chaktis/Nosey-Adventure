@@ -9,7 +9,7 @@ class LevelOne extends Phaser.Scene{
         this.physics.world.gravity.y = 950;
 
         // Turn off debug
-        //this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
+        this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
 
         // COUNTERS
         this.coinCount = 0;
