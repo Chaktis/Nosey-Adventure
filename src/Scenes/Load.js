@@ -10,6 +10,7 @@ class Load extends Phaser.Scene {
         this.load.image("monochrome_tilemap_transparent", "monochrome_tilemap_transparent_packed.png");
         this.load.image("black_tile", "black_tile.png");
         this.load.image("crystal_tilemap", "crystal_tilemap.png");
+        this.load.image("Dungeon_Expanded_Tilemap", "DungeonTilesetExpanded.png");
 
         // Load images
         this.load.image("coin_particle", "coin_particle.png");
@@ -45,6 +46,9 @@ class Load extends Phaser.Scene {
         this.load.audio("hurt", "playerHurt.wav");
         this.load.audio("death", "playerDeath.wav");
         this.load.audio("enemyHurt", "enemyHurt.wav");
+        this.load.audio("enemyDeath", "enemyDeath.wav");
+        this.load.audio("heal", "heal.wav");
+        this.load.audio("swoosh", "swoosh.wav");
     }
 
     create() {

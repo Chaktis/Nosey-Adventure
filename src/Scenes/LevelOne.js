@@ -8,8 +8,8 @@ class LevelOne extends Phaser.Scene{
 
         this.physics.world.gravity.y = 950;
 
-        // turn off debug
-        this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
+        // Turn off debug
+        //this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
 
         // COUNTERS
         this.coinCount = 0;
@@ -17,8 +17,12 @@ class LevelOne extends Phaser.Scene{
         this.enemiesKilled = 0;
         this.gameOver = false
 
-        // stores locks that will be unlocked once player gets near
+        // Stores locks that will be unlocked once player gets near
         this.pendingUnlocks = [];
+
+        // Correct statue order
+        this.statueCode = ["statue1", "statue2", "statue3", "statue4", "statue5", "statue6"]
+        this.statueLog = []
     }
 
     preload() {
@@ -51,7 +55,8 @@ class LevelOne extends Phaser.Scene{
         const oneBit = this.map.addTilesetImage("black_tile", "black_tile");
         const oneBitTransparent = this.map.addTilesetImage("1-bit-transparent", "monochrome_tilemap_transparent");
         const oneBitCrystal = this.map.addTilesetImage("crystal_tilemap", "crystal_tilemap");
-        const tilesets = [oneBit, oneBitTransparent, oneBitCrystal];
+        const oneBiDungeon = this.map.addTilesetImage("Dungeon_Expanded_Tilemap", "Dungeon_Expanded_Tilemap");
+        const tilesets = [oneBit, oneBitTransparent, oneBitCrystal, oneBiDungeon];
 
 
         // LAYER SETUP
@@ -78,12 +83,12 @@ class LevelOne extends Phaser.Scene{
         this.player = new Player(this, 2750, 10, "characters", 240, this.inputKeys);
         this.player.setCollideWorldBounds(true);
 
+
         // ENEMY SETUP
         this.enemies = this.physics.add.group();
 
         // Get point objects from "EnemySpawns" layer in Tiled
         const enemySpawnObjects = this.map.getObjectLayer('EnemySpawns').objects;
-        
         enemySpawnObjects.forEach((obj) => {
 
             // Use Tiled Class property
@@ -99,8 +104,6 @@ class LevelOne extends Phaser.Scene{
 
             enemy.setScale(2);
             this.enemies.add(enemy);
-
-            console.log(obj);
         });
 
 
@@ -110,6 +113,8 @@ class LevelOne extends Phaser.Scene{
         this.coinGroup = this.physics.add.staticGroup();
         this.keyGroup = this.physics.add.staticGroup();
         this.doorGroup = this.physics.add.staticGroup();
+        this.statueGroup = this.physics.add.staticGroup();
+
 
         // LAYER COLLISIONS
         this.physics.add.collider(this.player, this.collisionLayer);
@@ -148,7 +153,6 @@ class LevelOne extends Phaser.Scene{
             door.body.setOffset(offsetX, offsetY);
             this.doorGroup.add(door);
         });
-
 
 
         // LOCK OBJECTS
@@ -307,6 +311,32 @@ class LevelOne extends Phaser.Scene{
         });
 
 
+        // STATUE OBJECTS
+        const statueObjects = this.map.getObjectLayer('CypherStatues').objects;
+        statueObjects.forEach(obj => {
+            // Get tile's global ID in tilesheet
+            const gid = obj.gid;
+
+            // Convert GID to the frame index in the tileset’s image
+            const tileset = this.map.tilesets[0]; // Find specific tileset
+            const firstgid = tileset.firstgid;
+            const frameIndex = gid - firstgid; // get local frame index
+
+            // Create the sprite using that frame
+            const statue = this.statueGroup.create(
+                obj.x * 2,
+                obj.y * 2,
+                'characters',   
+                frameIndex 
+            );
+
+            statue.setOrigin(0, 1);
+            statue.setScale(2);
+        });
+
+
+
+        
 
         /////////////// *** COLLISION DETECTION*** ///////////////
 
@@ -339,6 +369,7 @@ class LevelOne extends Phaser.Scene{
             if (this.coinCount % 10 == 0) {
                 this.player.health++;
                 this.healthCounter.setText('x ' + this.player.health);
+                this.sound.play("heal", { volume: 0.5 });
             }
         })
 
@@ -360,6 +391,14 @@ class LevelOne extends Phaser.Scene{
         this.physics.add.overlap(this.player.attackHitbox, this.enemies, (hitbox, enemy) => {
             if (this.player.isAttacking && hitbox.active) {
                 enemy.takeDamage();
+            }
+        });
+
+
+        // PLAYER INTERACTING WITH STATUES
+        this.physics.add.overlap(this.player.attackHitbox, this.statueGroup, (hitbox, statue) => {
+            if (this.player.isAttacking && hitbox.active) {
+                this.statueHit(statue)
             }
         });
 
@@ -468,6 +507,30 @@ class LevelOne extends Phaser.Scene{
             // Queue it for unlocking when the player gets close
             this.pendingUnlocks.push(lockToUnlock);
         }  
+    }
+
+
+    statueHit(statue) {
+        // Check if statueLog and statueCode are the same
+        const sequence = this.statueLog.map(s => s.id);
+        if (sequence.length === this.statueCode.length) {
+            const matches = sequence.every((id, i) => id === this.statueCode[i]);
+            if (matches) {
+                console.log("Success!");
+                // spawn key here
+            } else {
+                // Reset statues if wrong sequence
+                this.statueLog.forEach(obj => obj.sprite.alpha = 1);
+                this.statueLog = [];
+            }
+            return;
+        }
+        // Otherwise, add statue if not already hit
+        if (!this.statueLog.find(s => s.sprite === statue)) {
+            statue.alpha = 0.5;
+            this.statueLog.push({ id: statue.type, sprite: statue });
+            console.log(this.statueLog);
+        }
     }
 
 

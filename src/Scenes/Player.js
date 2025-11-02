@@ -149,6 +149,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.canAttack = false;
         this.attackHitbox.active = true;
         this.anims.play('attack', true);
+        this.scene.sound.play("swoosh", { volume: 0.2 });
 
         // Slash hitbox/animation offset
         const facingLeft = this.flipX;
