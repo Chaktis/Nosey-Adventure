@@ -563,8 +563,8 @@
                  "type":"statue1",
                  "visible":true,
                  "width":16,
-                 "x":1216,
-                 "y":576
+                 "x":784,
+                 "y":432
                 }, 
                 {
                  "gid":296,
@@ -575,8 +575,8 @@
                  "type":"statue2",
                  "visible":true,
                  "width":16,
-                 "x":1248,
-                 "y":544
+                 "x":640,
+                 "y":480
                 }, 
                 {
                  "gid":42,
@@ -587,8 +587,8 @@
                  "type":"statue3",
                  "visible":true,
                  "width":16,
-                 "x":1296,
-                 "y":544
+                 "x":368,
+                 "y":272
                 }, 
                 {
                  "gid":79,
@@ -599,8 +599,8 @@
                  "type":"statue4",
                  "visible":true,
                  "width":16,
-                 "x":1424,
-                 "y":544
+                 "x":640,
+                 "y":112
                 }, 
                 {
                  "gid":48,
@@ -611,8 +611,8 @@
                  "type":"statue5",
                  "visible":true,
                  "width":16,
-                 "x":1472,
-                 "y":544
+                 "x":496,
+                 "y":432
                 }, 
                 {
                  "gid":1073741841,
@@ -623,8 +623,8 @@
                  "type":"statue6",
                  "visible":true,
                  "width":16,
-                 "x":1520,
-                 "y":544
+                 "x":912,
+                 "y":272
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -5336,18 +5336,6 @@
                  "width":16,
                  "x":2128,
                  "y":1520
-                }, 
-                {
-                 "gid":97,
-                 "height":16,
-                 "id":875,
-                 "name":"key",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":640,
-                 "y":96
                 }],
          "opacity":1,
          "type":"objectgroup",

@@ -14,7 +14,7 @@ class LevelOne extends Phaser.Scene{
         // COUNTERS
         this.coinCount = 0;
         this.keysCollected = 0;
-        this.enemiesKilled = 0;
+        this.cypherCompleted = false;
         this.gameOver = false
 
         // Stores locks that will be unlocked once player gets near
@@ -332,6 +332,9 @@ class LevelOne extends Phaser.Scene{
 
             statue.setOrigin(0, 1);
             statue.setScale(2);
+
+            // Copy Tiled "class" property
+            statue.type = obj.type;
         });
 
 
@@ -511,25 +514,37 @@ class LevelOne extends Phaser.Scene{
 
 
     statueHit(statue) {
-        // Check if statueLog and statueCode are the same
+        // Prevent repeated triggers from lingering attack hitbox/don't run if puzzle complete
+        if (statue.justHit || this.cypherCompleted) return;
+        statue.justHit = true;
+
+        // Reset flag after attack finished
+        this.time.delayedCall(200, () => {
+            statue.justHit = false;
+        });
+
         const sequence = this.statueLog.map(s => s.id);
+
+        // Check if sequences match
         if (sequence.length === this.statueCode.length) {
             const matches = sequence.every((id, i) => id === this.statueCode[i]);
+
             if (matches) {
                 console.log("Success!");
-                // spawn key here
-            } else {
-                // Reset statues if wrong sequence
-                this.statueLog.forEach(obj => obj.sprite.alpha = 1);
+                const key = this.keyGroup.create(1290, 1300, 'key');
+                key.setScale(2.0);
+                this.cypherCompleted = true
+            } else { // Wrong order — reset everything
+                this.statueLog.forEach(obj => {obj.sprite.alpha = 1;});
                 this.statueLog = [];
             }
             return;
         }
-        // Otherwise, add statue if not already hit
+
+        // Only add statue if not already in the log
         if (!this.statueLog.find(s => s.sprite === statue)) {
             statue.alpha = 0.5;
             this.statueLog.push({ id: statue.type, sprite: statue });
-            console.log(this.statueLog);
         }
     }
 
