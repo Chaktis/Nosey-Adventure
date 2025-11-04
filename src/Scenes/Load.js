@@ -49,6 +49,7 @@ class Load extends Phaser.Scene {
         this.load.audio("enemyDeath", "enemyDeath.wav");
         this.load.audio("heal", "heal.wav");
         this.load.audio("swoosh", "swoosh.wav");
+        this.load.audio("statueHit", "statueHit.wav");
     }
 
     create() {
@@ -136,6 +137,16 @@ class Load extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'groundHurt',
+            frames: [
+                {key: 'enemies', frame: 21},
+                {key: 'enemies', frame: 10}
+            ],
+            frameRate: 8,
+            repeat: 0
+        });
+
+        this.anims.create({
             key: 'groundDie',
             frames: [
                 {key: 'enemies', frame: 21}
@@ -157,6 +168,17 @@ class Load extends Phaser.Scene {
             ],
             frameRate: 10,
             repeat: -1
+        });
+
+        this.anims.create({
+            key: 'flyingHurt',
+            frames: [
+                {key: 'enemies', frame: 21},
+                {key: 'nosebat', frame: 5}
+                
+            ],
+            frameRate: 8,
+            repeat: 0
         });
 
         this.anims.create({

@@ -20,6 +20,19 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         // PHYSICS
         scene.add.existing(this);
         scene.physics.add.existing(this);
+
+
+        // Death particles
+        this.deathParticles = this.scene.add.particles(0, 0, "coin_particle", {
+            quantity: 20,
+            lifespan: 250,
+            speed: { min: 110, max: 140 },
+            angle: { min: 0, max: 360 },
+            scale: { start: 1.0, end: 0 },
+            alpha: { start: 1, end: 0.8 },
+            gravityY: 0,
+            emitting: false // only triggered manually with explode 
+        });
     }
 }
 
@@ -67,7 +80,19 @@ class GroundEnemy extends Enemy {
 
         // Reduce health + play sound
         this.health -= 100;
+        this.speed = 0
         this.scene.sound.play("enemyHurt", {volume: 0.5});
+        this.play('groundHurt');
+
+
+        // Return to idle once animation finishes
+            this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, (anim, frame) => {
+                if (anim.key === 'groundHurt' && this.alive) {
+                    this.play('groundIdle');
+                    this.speed = 50;
+                }
+            });
+
 
         this.canTakeDamage = false
 
@@ -82,7 +107,9 @@ class GroundEnemy extends Enemy {
 
             // play death animation
             this.play('groundDie');
-            this.alive = false;
+
+            //trigger particle effect
+            this.deathParticles.explode(25, this.x, this.y); // Number determines # of particles
 
             // play death sound
             //this.scene.sound.play("enemyDeath", {volume: 0.5});
@@ -106,7 +133,7 @@ class FlyingEnemy extends Enemy {
         super(scene, x, y, patrolDistance);
 
         this.speed = 50;
-        this.health = 200;
+        this.health = 300;
 
 
         // Enemy Hitbox
@@ -141,9 +168,19 @@ class FlyingEnemy extends Enemy {
         /// If the enemy isn't alive or can't take damage, don't trigger
         if (!this.alive || !this.canTakeDamage) return;
 
-        // Reduce health + play sound
+        // Reduce health + play sounds/anims
         this.health -= 100;
+        this.speed = 0
         this.scene.sound.play("enemyHurt", {volume: 0.5});
+        this.play('flyingHurt');
+
+        // Return to idle once animation finishes
+            this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, (anim, frame) => {
+                if (anim.key === 'flyingHurt' && this.alive) {
+                    this.play('flyingIdle');
+                    this.speed = 50;
+                }
+            });
 
         this.canTakeDamage = false
 
@@ -158,7 +195,9 @@ class FlyingEnemy extends Enemy {
 
             // play death animation
             this.play('flyingDie');
-            this.alive = false;
+
+            //trigger particle effect
+            this.deathParticles.explode(20, this.x, this.y); // Number determines # of particles
 
             // play death sound
             //this.scene.sound.play("enemyDeath", {volume: 0.5});

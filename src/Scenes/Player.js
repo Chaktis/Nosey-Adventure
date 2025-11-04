@@ -57,9 +57,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             if (this.inputKeys.cursors.left.isDown || this.inputKeys.keys.A.isDown) {
                 this.setAccelerationX(-this.ACCELERATION);
                 this.setFlip(true, false);
-                this.scene.cameras.main.followOffset.set(100, 50);
             } else if (this.inputKeys.cursors.right.isDown || this.inputKeys.keys.D.isDown) {
-                this.scene.cameras.main.followOffset.set(-100, 50);
                 this.setAccelerationX(this.ACCELERATION);
                 this.resetFlip(); 
             } else {
@@ -148,6 +146,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.isAttacking = true;
         this.canAttack = false;
         this.attackHitbox.active = true;
+
         this.anims.play('attack', true);
         this.scene.sound.play("swoosh", { volume: 0.2 });
 
@@ -206,13 +205,34 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
             this.canTakeDamage = false;
             this.isHurt = true;
-            this.anims.play('hurt', true);
+
             this.scene.sound.play("hurt", { volume: 0.5 });
 
-            // Reset flag after a delay
+            // Flash transparency for invincibility frames
+            this.flashTween = this.scene.time.addEvent({
+                delay: 150,
+                callback: () => {
+                    this.alpha = this.alpha === 1 ? 0 : 1;
+                },
+                loop: true
+            });
+
+            // isHurt should only be true briefly, so other anims can play again (blocks them otherwise)
+            this.scene.time.delayedCall(400, () => {
+                // TODO: add hurt animation
+                this.isHurt = false;
+            });
+
+            // Reset canTakeDamage flag and stop flashing
             this.scene.time.delayedCall(this.damageCooldown, () => {
                 this.canTakeDamage = true;
                 this.isHurt = false;
+
+                // Stop flashing and reset opacity
+                if (this.flashTween) {
+                    this.flashTween.remove();
+                    this.setAlpha(1);
+                }
             });
         }
     }

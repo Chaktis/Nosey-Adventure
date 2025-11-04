@@ -63,20 +63,20 @@ class LevelOne extends Phaser.Scene{
         // Create level layers
         this.bgLayer = this.map.createLayer("Background", tilesets, 0, 0);
         this.bgLayer.setScale(2.0);
-        this.bgLayer.alpha = 0.35;
+        this.bgLayer.alpha = 0.2;
 
         this.collisionLayer = this.map.createLayer("Collision-Layer", tilesets, 0, 0);
         this.collisionLayer.setScale(2.0);
         this.collisionLayer.setCollisionByProperty({ collides: true });
-        this.collisionLayer.alpha = 1.0;
+        //this.collisionLayer.alpha = 1.0;
 
         this.groundLayer = this.map.createLayer("Base-Layer", tilesets, 0, 0);
         this.groundLayer.setScale(2.0);
-        this.groundLayer.alpha = 1.0;
+        //this.groundLayer.alpha = 1.0;
 
         this.foregroundLayer = this.map.createLayer("Foreground", tilesets, 0, 0);
         this.foregroundLayer.setScale(2.0);
-        this.foregroundLayer.alpha = 1.0;
+        //this.foregroundLayer.alpha = 1.0;
 
 
         // PLAYER SETUP
@@ -447,11 +447,17 @@ class LevelOne extends Phaser.Scene{
         // CAMERA SETUP
         this.cameras.main.setBounds(0, 0, 5140, 8500);
         this.physics.world.setBounds(0, 0, 5140, 8500);
-        this.cameras.main.startFollow(this.player, true, 0.08, 0.08, 100, 0);
-        this.cameras.main.setDeadzone(150, 150);
+        this.cameras.main.startFollow(this.player, true, 0.08, 0.08, 100, -100);
+        this.cameras.main.setDeadzone(10, 100); // Determines how far you can move before the screen moves with you
         this.cameras.main.setZoom(2.0);
-        this.cameras.main.followOffset.set(-100, 0);
+        this.cameras.main.followOffset.set(0, -50);
         this.physics.world.TILE_BIAS = 40; // should help with not having the player go through tiles while falling
+
+        // CAMERA LOOK VARIABLES
+        this.cameraLookOffset = 0;       // current camera offset
+        this.cameraLookTarget = 0;       // target offset (changes when player looks up/down)
+        this.lookAmount = 120;           // how far to shift the camera
+        this.lookSpeed = 6;              // how quickly to shift to target position
 
         
         // GAME RESTART
@@ -516,8 +522,8 @@ class LevelOne extends Phaser.Scene{
     statueHit(statue) {
         // Prevent repeated triggers from lingering attack hitbox/don't run if puzzle complete
         if (statue.justHit || this.cypherCompleted) return;
+        
         statue.justHit = true;
-
         // Reset flag after attack finished
         this.time.delayedCall(200, () => {
             statue.justHit = false;
@@ -530,7 +536,6 @@ class LevelOne extends Phaser.Scene{
             const matches = sequence.every((id, i) => id === this.statueCode[i]);
 
             if (matches) {
-                console.log("Success!");
                 const key = this.keyGroup.create(1290, 1300, 'key');
                 key.setScale(2.0);
                 this.cypherCompleted = true
@@ -545,6 +550,7 @@ class LevelOne extends Phaser.Scene{
         if (!this.statueLog.find(s => s.sprite === statue)) {
             statue.alpha = 0.5;
             this.statueLog.push({ id: statue.type, sprite: statue });
+            this.sound.play("statueHit", { volume: 0.2 });
         }
     }
 
