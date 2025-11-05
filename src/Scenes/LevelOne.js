@@ -48,8 +48,9 @@ class LevelOne extends Phaser.Scene{
 
 
         // TILEMAP SETUP
-        // Create new 16x16 tilemap game object that uses pixel tiles, 40 tiles wide and 30 tiles tall.
+        // Create new 16x16 tilemap game object that uses pixel tiles
         this.map = this.add.tilemap("level-one", 16, 16, 183, 120);
+        this.animatedTiles.init(this.map);
 
         // Add a tileset to the map
         const oneBit = this.map.addTilesetImage("black_tile", "black_tile");
@@ -68,15 +69,12 @@ class LevelOne extends Phaser.Scene{
         this.collisionLayer = this.map.createLayer("Collision-Layer", tilesets, 0, 0);
         this.collisionLayer.setScale(2.0);
         this.collisionLayer.setCollisionByProperty({ collides: true });
-        //this.collisionLayer.alpha = 1.0;
 
         this.groundLayer = this.map.createLayer("Base-Layer", tilesets, 0, 0);
         this.groundLayer.setScale(2.0);
-        //this.groundLayer.alpha = 1.0;
 
         this.foregroundLayer = this.map.createLayer("Foreground", tilesets, 0, 0);
         this.foregroundLayer.setScale(2.0);
-        //this.foregroundLayer.alpha = 1.0;
 
 
         // PLAYER SETUP

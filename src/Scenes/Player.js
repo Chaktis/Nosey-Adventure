@@ -18,7 +18,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.MAX_FALLING_VELOCITY = 400;
         this.DRAG = 6000;
         this.AIR_DRAG = 10000;
-        this.JUMP_VELOCITY = -500;
+        this.JUMP_VELOCITY = -520;
 
 
         // PLAYER SETUP
@@ -46,6 +46,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.canTakeDamage = true;
         this.canAttack = true
         this.isAttacking = false;
+        this.isJumping = false;
+        this.jumpKeyHeld = false;
+        this.jumpCutPower = 0.625; // how much to cut velocity by when jump released early
         this.attackCooldown = 450;
         this.damageCooldown = 5000; 
     }
@@ -74,19 +77,35 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 this.setVelocityY(this.MAX_FALLING_VELOCITY);
             }
 
-
             // Grounded drag
             this.setDragX(this.body.blocked.down ? this.DRAG : this.AIR_DRAG);
 
 
-            // Jumping input
-            if (this.body.blocked.down && (
-                Phaser.Input.Keyboard.JustDown(this.inputKeys.cursors.up) || 
-                Phaser.Input.Keyboard.JustDown(this.inputKeys.keys.W) || 
+            // --- Handle jump start ---
+            const jumpPressed = (
+                Phaser.Input.Keyboard.JustDown(this.inputKeys.cursors.up) ||
+                Phaser.Input.Keyboard.JustDown(this.inputKeys.keys.W) ||
                 Phaser.Input.Keyboard.JustDown(this.inputKeys.spaceKey)
-            )) {
+            );
+
+
+            const jumpReleased = (
+                Phaser.Input.Keyboard.JustUp(this.inputKeys.cursors.up) ||
+                Phaser.Input.Keyboard.JustUp(this.inputKeys.keys.W) ||
+                Phaser.Input.Keyboard.JustUp(this.inputKeys.spaceKey)
+            );
+
+
+            if (this.body.blocked.down && jumpPressed) {
                 this.jump();
             }
+
+            // Cut jump velocity if released early
+            if (this.isJumping && jumpReleased && this.body.velocity.y < 0) {
+                this.setVelocityY(this.body.velocity.y * this.jumpCutPower);
+                this.isJumping = false;
+            }
+
 
 
             // Attacking Input
@@ -131,13 +150,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     }
 
-    jump(){
+    jump() {
+        this.isJumping = true;
         this.setVelocityY(this.JUMP_VELOCITY);
-        this.scene.sound.play("jump", {
-            volume: 0.4,
-            rate: Phaser.Math.FloatBetween(0.95, 1.15)
-        });
-
+        this.scene.sound.play("jump", { volume: 0.4 });
     }
 
 

@@ -28,6 +28,15 @@ let config = {
     scale: {
         mode: Phaser.Scale.FIT,        
         autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    plugins: {
+        scene: [
+            {
+                key: 'AnimatedTiles',
+                plugin: AnimatedTiles,
+                mapping: 'animatedTiles'
+            }
+        ]
     }
 }
 
