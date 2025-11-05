@@ -19,6 +19,7 @@ class LevelOne extends Phaser.Scene{
 
         // Stores locks that will be unlocked once player gets near
         this.pendingUnlocks = [];
+        this.nextLockIndex = 0; // keep track of which lock to unlock next
 
         // Correct statue order
         this.statueCode = ["statue1", "statue2", "statue3", "statue4", "statue5", "statue6"]
@@ -509,11 +510,13 @@ class LevelOne extends Phaser.Scene{
 
     // Makes the locks disappear as the player collects the keys
     unlockNextLock() {
-            const lockToUnlock = this.lockArray[this.lockArray.length - this.keysCollected]; // reverse order
+        if (this.nextLockIndex < this.lockArray.length) {
+            const lockToUnlock = this.lockArray[this.lockArray.length - 1 - this.nextLockIndex];
             if (lockToUnlock) {
-            // Queue it for unlocking when the player gets close
-            this.pendingUnlocks.push(lockToUnlock);
-        }  
+                this.pendingUnlocks.push(lockToUnlock);
+                this.nextLockIndex++;
+            }
+        }
     }
 
 

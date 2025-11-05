@@ -1251,9 +1251,9 @@
   <object id="623" gid="48" x="1760" y="96" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="11" name="Keys">
-  <object id="599" name="key" gid="97" x="752" y="1120" width="16" height="16"/>
-  <object id="601" name="key" gid="97" x="2432" y="1264" width="16" height="16"/>
-  <object id="792" name="key" gid="97" x="2128" y="1520" width="16" height="16"/>
+  <object id="599" name="key" gid="97" x="1328" y="1120" width="16" height="16"/>
+  <object id="601" name="key" gid="97" x="1392" y="1120" width="16" height="16"/>
+  <object id="792" name="key" gid="97" x="1360" y="1120" width="16" height="16"/>
  </objectgroup>
  <layer id="4" name="Foreground" width="164" height="120">
   <data encoding="csv">
