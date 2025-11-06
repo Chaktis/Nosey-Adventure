@@ -482,21 +482,9 @@ class LevelOne extends Phaser.Scene{
         // UPDATE PLAYER
         this.player.update()
 
-        // Check for nearby pending locks to unlock
-        this.pendingUnlocks = this.pendingUnlocks.filter(lock => {
-            const distance = Phaser.Math.Distance.Between(
-                this.player.x, this.player.y,
-                lock.x, lock.y
-            );
-
-            if (distance < 200) { // can adjust proximity
-                this.lockGroup.remove(lock, true, true); // remove from pendingUnlocks
-                this.coinCollectParticles.explode(10, lock.x + 18, lock.y - 20);
-                this.keysCollected--;
-                this.keyCount.setText('x ' + this.keysCollected);
-                return false; 
-            }
-            return true; // don't remove if still too far
+        // If lock exists, call update
+        this.pendingUnlocks.forEach(lock => {
+            if (lock.update) lock.update();
         });
 
         // LOSE CONDITIONS
@@ -508,15 +496,37 @@ class LevelOne extends Phaser.Scene{
 
 
 
-    // Makes the locks disappear as the player collects the keys
+    // Makes the locks disappear as the player collects keys
     unlockNextLock() {
-        if (this.nextLockIndex < this.lockArray.length) {
-            const lockToUnlock = this.lockArray[this.lockArray.length - 1 - this.nextLockIndex];
-            if (lockToUnlock) {
-                this.pendingUnlocks.push(lockToUnlock);
-                this.nextLockIndex++;
+
+        // Calculate index of the lock in lockArray (want to go in reverse order, unlock closest to player first)
+        const lockToUnlock = this.lockArray[this.lockArray.length - 1 - this.nextLockIndex];
+        if (!lockToUnlock) return;
+
+        this.nextLockIndex++;
+        this.pendingUnlocks.push(lockToUnlock);
+
+        // Check distance between player and lock
+        lockToUnlock.update = () => {
+            const distance = Phaser.Math.Distance.Between(
+                this.player.x, this.player.y,
+                lockToUnlock.x, lockToUnlock.y
+            );
+
+            // If player is close enough, remove lock + trigger effects
+            if (distance < 200) {
+                this.coinCollectParticles.explode(10, lockToUnlock.x + 18, lockToUnlock.y - 20);
+                this.keysCollected--;
+                this.keyCount.setText('x ' + this.keysCollected);
+
+                // Remove from lists
+                this.lockGroup.remove(lockToUnlock, true, true);
+                this.pendingUnlocks = this.pendingUnlocks.filter(l => l !== lockToUnlock);
+
+                // Prevent updating lock further
+                delete lockToUnlock.update;
             }
-        }
+        };
     }
 
 
