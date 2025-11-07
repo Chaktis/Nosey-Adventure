@@ -3,12 +3,20 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "final_gameNEdit.tmx",
+    "activeFile": "final_gameNedit2.tmx",
+    "console.history": [
+        "tiled.activeAsset.selectedObjects.length",
+        "tiled.activeAsset.selectedObjects.length",
+        "tiled.activeAsset.selectedArea.get().rects.reduce((area, rect) => area += rect.width*rect.height, 0)\n"
+    ],
     "expandedProjectPaths": [
         "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
+        "": {
+            "scaleInDock": 2
+        },
         "final_game.tmx": {
             "scale": 1.5,
             "selectedLayer": 1,
@@ -46,20 +54,44 @@
         },
         "final_gameNEdit.tmx#crystal_tilemap": {
             "scaleInDock": 2
+        },
+        "final_gameNedit2.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 1111.3333333333333,
+                "y": 632
+            }
+        },
+        "final_gameNedit2.tmx#1-bit-transparent": {
+            "scaleInDock": 4
+        },
+        "final_gameNedit2.tmx#Dungeon_Expanded_Tilemap": {
+            "scaleInDock": 2
+        },
+        "final_gameNedit2.tmx#OvergrownSheetEx": {
+            "scaleInDock": 2
+        },
+        "final_gameNedit2.tmx#black_tile": {
+            "scaleInDock": 1
+        },
+        "final_gameNedit2.tmx#crystal_tilemap": {
+            "scaleInDock": 3
         }
     },
-    "last.imagePath": "E:/Game Projects/ARTG170/Knight/Tiled/assets/assets",
+    "last.imagePath": "E:/Game Projects/ARTG170/Knight/Tiled/assets (1)/assets",
     "map.height": 120,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
     "map.tileWidth": 16,
     "map.width": 80,
     "openFiles": [
-        "final_gameNEdit.tmx"
+        "final_gameNedit2.tmx"
     ],
     "project": "final_game_project.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "final_gameNedit2.tmx",
         "final_gameNEdit.tmx",
         "final_game.tmx"
     ],

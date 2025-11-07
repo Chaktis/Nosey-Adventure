@@ -11,6 +11,7 @@ class Load extends Phaser.Scene {
         this.load.image("black_tile", "black_tile.png");
         this.load.image("crystal_tilemap", "crystal_tilemap.png");
         this.load.image("Dungeon_Expanded_Tilemap", "DungeonTilesetExpanded.png");
+        this.load.image("OvergrownSheetEx", "OvergrownSheetEx.png");
 
         // Load images
         this.load.image("coin_particle", "coin_particle.png");

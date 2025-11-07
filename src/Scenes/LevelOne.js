@@ -57,8 +57,9 @@ class LevelOne extends Phaser.Scene{
         const oneBit = this.map.addTilesetImage("black_tile", "black_tile");
         const oneBitTransparent = this.map.addTilesetImage("1-bit-transparent", "monochrome_tilemap_transparent");
         const oneBitCrystal = this.map.addTilesetImage("crystal_tilemap", "crystal_tilemap");
-        const oneBiDungeon = this.map.addTilesetImage("Dungeon_Expanded_Tilemap", "Dungeon_Expanded_Tilemap");
-        const tilesets = [oneBit, oneBitTransparent, oneBitCrystal, oneBiDungeon];
+        const oneBitDungeon = this.map.addTilesetImage("Dungeon_Expanded_Tilemap", "Dungeon_Expanded_Tilemap");
+        const oneBitOvergrown = this.map.addTilesetImage("OvergrownSheetEx", "OvergrownSheetEx");
+        const tilesets = [oneBit, oneBitTransparent, oneBitCrystal, oneBitDungeon, oneBitOvergrown];
 
 
         // LAYER SETUP
