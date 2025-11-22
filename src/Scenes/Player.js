@@ -12,7 +12,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.health = 4;
     
 
-        // PLAYER JUMP VALUES
+        // DEFAULT PLAYER JUMP VALUES
         this.ACCELERATION = 1000;
         this.MAX_VELOCITY = 170;
         this.MAX_FALLING_VELOCITY = 400;
@@ -42,14 +42,25 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.attackHitbox.active = false; // starts inactive
 
         // FLAGS
-        this.playerAlive = true;
-        this.canTakeDamage = true;
+        this.currentZones = new Set();
+
+        this.inWater = false
+        this.canSwim = false
+        this.isSwimming = false
+        this.swimCooldown = 200
+
+        this.noGravity = false
+        
         this.canAttack = true
         this.isAttacking = false;
+        this.attackCooldown = 450;
+
         this.isJumping = false;
         this.jumpKeyHeld = false;
         this.jumpCutPower = 0.625; // how much to cut velocity by when jump released early
-        this.attackCooldown = 450;
+        
+        this.playerAlive = true;
+        this.canTakeDamage = true;
         this.damageCooldown = 5000; 
     }
 
@@ -77,11 +88,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 this.setVelocityY(this.MAX_FALLING_VELOCITY);
             }
 
-            // Grounded drag
             this.setDragX(this.body.blocked.down ? this.DRAG : this.AIR_DRAG);
 
 
-            // --- Handle jump start ---
             const jumpPressed = (
                 Phaser.Input.Keyboard.JustDown(this.inputKeys.cursors.up) ||
                 Phaser.Input.Keyboard.JustDown(this.inputKeys.keys.W) ||
@@ -96,54 +105,92 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             );
 
 
-            if (this.body.blocked.down && jumpPressed) {
+            // PLAYER STATES
+            // Reset zone effects
+            this.inWater = this.currentZones.has("water");
+            this.noGravity = this.currentZones.has("flipG");
+
+            // Handle exiting/entering water
+            if (!this.wasInWater && this.inWater) { // Entering water
+                // Play splash sfx or smth
+            }
+            if (this.wasInWater && !this.inWater) { // Exiting water
                 this.jump();
             }
+            this.wasInWater = this.inWater;
 
-            // Cut jump velocity if released early
-            if (this.isJumping && jumpReleased && this.body.velocity.y < 0) {
-                this.setVelocityY(this.body.velocity.y * this.jumpCutPower);
-                this.isJumping = false;
-            }
+            // Apply effects
+            if (this.inWater) {
+                this.scene.physics.world.gravity.y = 450;
+                this.MAX_VELOCITY = 130;
+                this.MAX_FALLING_VELOCITY = 250;
 
-
-
-            // Attacking Input
-            if (!this.isAttacking && 
-                this.canAttack && 
-                (Phaser.Input.Keyboard.JustDown(this.inputKeys.cursors.down) || 
-                Phaser.Input.Keyboard.JustDown(this.inputKeys.keys.S))
-            ){
-                this.attack();
-            }
-
-            // Move slash with player
-            if (this.isAttacking && this.slashSprite) {
-                const facingLeft = this.flipX;
-                const offsetX = facingLeft ? -Math.abs(this.attackOffset.x) : Math.abs(this.attackOffset.x);
-                const offsetY = this.attackOffset.y;
-
-                
-                this.slashSprite.setPosition(this.x + offsetX, this.y + offsetY);
-                this.attackHitbox.setPosition(this.x + offsetX, this.y + offsetY);
-            }
-
-
-            // Animation logic
+                if (jumpPressed) {
+                    this.swim();
+                }
+            } 
+            else if (this.noGravity) {
+                // FlipG behavior
+            } 
             else {
-                if (!this.isAttacking && !this.isHurt) { // If player isn't attacking or hurt
-                    if (!this.body.blocked.down && this.anims.currentAnim?.key !== 'jump') {
-                            this.anims.play('jump'); // Need this to be separate from jumping function, since otherwise it will be overridden
-                    } 
-                    else if (this.body.blocked.down) {
-                        if (this.body.velocity.x !== 0) {
-                            this.anims.play('walk', true);
-                        } else {
-                            this.anims.play('idle', true);
+
+                // Reset gravity/speed if it was altered
+                this.scene.physics.world.gravity.y = 950;
+                this.MAX_VELOCITY = 170;
+                this.MAX_FALLING_VELOCITY = 400;
+                
+                if (this.body.blocked.down && jumpPressed) {
+                    this.jump();
+                }
+
+                // Cut jump velocity if released early
+                if (this.isJumping && jumpReleased && this.body.velocity.y < 0) {
+                    this.setVelocityY(this.body.velocity.y * this.jumpCutPower);
+                    this.isJumping = false;
+                }
+
+
+
+                // Attacking Input
+                if (!this.isAttacking && 
+                    this.canAttack && 
+                    (Phaser.Input.Keyboard.JustDown(this.inputKeys.cursors.down) || 
+                    Phaser.Input.Keyboard.JustDown(this.inputKeys.keys.S))
+                ){
+                    this.attack();
+                }
+
+                // Move slash with player
+                if (this.isAttacking && this.slashSprite) {
+                    const facingLeft = this.flipX;
+                    const offsetX = facingLeft ? -Math.abs(this.attackOffset.x) : Math.abs(this.attackOffset.x);
+                    const offsetY = this.attackOffset.y;
+
+                    
+                    this.slashSprite.setPosition(this.x + offsetX, this.y + offsetY);
+                    this.attackHitbox.setPosition(this.x + offsetX, this.y + offsetY);
+                }
+
+
+                // Animation logic
+                ////// MIGHT NEED TO UPDATE THIS, right now will only play if player is in normal state
+                // Could also just have animation logic for each state?
+                else {
+                    if (!this.isAttacking && !this.isHurt) { // If player isn't attacking or hurt
+                        if (!this.body.blocked.down && this.anims.currentAnim?.key !== 'jump') {
+                                this.anims.play('jump'); // Need this to be separate from jumping function, since otherwise it will be overridden
+                        } 
+                        else if (this.body.blocked.down) {
+                            if (this.body.velocity.x !== 0) {
+                                this.anims.play('walk', true);
+                            } else {
+                                this.anims.play('idle', true);
+                            }
                         }
                     }
                 }
             }
+            
         }
         // Set player velocity to 0 if movement isn't enabled
         else this.setVelocityX(0);
@@ -154,6 +201,17 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.isJumping = true;
         this.setVelocityY(this.JUMP_VELOCITY);
         this.scene.sound.play("jump", { volume: 0.4 });
+    }
+
+    swim() {
+        this.swimPressed = true;
+        this.setVelocityY(this.JUMP_VELOCITY + 280);
+        //this.scene.sound.play("jump", { volume: 0.4 });
+
+        // Need a cooldown on swim because you don't need to be on the ground to do it
+        this.scene.time.delayedCall(this.swimCooldown, () => {
+            this.canSwim = true;
+        });
     }
 
 
@@ -199,9 +257,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         });
 
         // Reset flag after a delay
-                this.scene.time.delayedCall(this.attackCooldown, () => {
-                    this.canAttack = true;
-                });
+        this.scene.time.delayedCall(this.attackCooldown, () => {
+            this.canAttack = true;
+        });
 
     }
 

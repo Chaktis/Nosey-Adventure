@@ -13,10 +13,7 @@ let config = {
         default: 'arcade',
         arcade: {
             debug: true,
-            gravity: {
-                x: 0,
-                y: 0
-            },
+            gravity: { x: 0, y: 0 },
             fps: 50,           
             fixedStep: true,
             timeScale: 0.9 

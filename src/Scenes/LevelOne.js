@@ -9,7 +9,7 @@ class LevelOne extends Phaser.Scene{
         this.physics.world.gravity.y = 950;
 
         // Turn off debug
-        this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
+        //this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
 
         // COUNTERS
         this.coinCount = 0;
@@ -79,9 +79,11 @@ class LevelOne extends Phaser.Scene{
         this.foregroundLayer.setScale(2.0);
 
 
+
         // PLAYER SETUP
         this.player = new Player(this, 2750, 10, "characters", 240, this.inputKeys);
         this.player.setCollideWorldBounds(true);
+
 
 
         // ENEMY SETUP
@@ -107,14 +109,6 @@ class LevelOne extends Phaser.Scene{
         });
 
 
-        // PHYSICS GROUPS
-        this.spikeGroup = this.physics.add.staticGroup();
-        this.lockGroup = this.physics.add.staticGroup();
-        this.coinGroup = this.physics.add.staticGroup();
-        this.keyGroup = this.physics.add.staticGroup();
-        this.doorGroup = this.physics.add.staticGroup();
-        this.statueGroup = this.physics.add.staticGroup();
-
 
         // LAYER COLLISIONS
         this.physics.add.collider(this.player, this.collisionLayer);
@@ -125,19 +119,39 @@ class LevelOne extends Phaser.Scene{
 
         /////////////// ***OBJECT CREATION*** ///////////////
 
+        // MAP ZONE OBJECTS
+        const zoneObjects = this.map.getObjectLayer("Zones").objects;
+        this.zones = this.physics.add.staticGroup();
+
+        zoneObjects.forEach(obj => {
+            const zone = this.add.rectangle(
+                (obj.x + obj.width/2) * 2,
+                (obj.y + obj.height/2) * 2, 
+                obj.width * 2, 
+                obj.height * 2
+            );
+
+            this.physics.add.existing(zone, true);
+
+            zone.zoneType = obj.name
+            zone.isZone = true;
+
+            this.zones.add(zone);
+        });
+
+
+
         // DOOR OBJECT
         const doorObject = this.map.getObjectLayer('Exit').objects;
-        doorObject.forEach(obj => {
+        this.doorGroup = this.physics.add.staticGroup();
 
-            // get the "frameInt" property from Tiled
-            let frameInt = obj.properties?.find(p => p.name === 'FrameInt')?.value ?? 56;
+        doorObject.forEach(obj => {
 
             // set characteristics
             const door = this.doorGroup.create(
                 obj.x * 2,
                 obj.y * 2,
-                'characters',       
-                frameInt           
+                'characters'       
             );
 
             door.setOrigin(0, 1);
@@ -156,20 +170,17 @@ class LevelOne extends Phaser.Scene{
 
 
         // LOCK OBJECTS
+        this.lockGroup = this.physics.add.staticGroup();
         this.lockArray = [];
         const lockObjects = this.map.getObjectLayer('Gate').objects;
-        // for each lock object
-        lockObjects.forEach(obj => {
 
-            // get the "frameInt" property from Tiled
-            let frameInt = obj.properties?.find(p => p.name === 'FrameInt')?.value ?? 47;
+        lockObjects.forEach(obj => {
 
             // set characteristics
             const lock = this.lockGroup.create(
                 obj.x * 2,
                 obj.y * 2,
-                'monochrome_tilemap_spritesheet',       
-                frameInt           
+                'monochrome_tilemap_spritesheet'           
             );
 
             lock.setOrigin(0, 1);
@@ -189,8 +200,8 @@ class LevelOne extends Phaser.Scene{
 
 
         // SPIKE OBJECTS
+        this.spikeGroup = this.physics.add.staticGroup();
         const spikeObjects = this.map.getObjectLayer('Spikes').objects;
-        // for each spike object
         spikeObjects.forEach(obj => {
 
             // get the "frameInt" property from Tiled
@@ -260,7 +271,10 @@ class LevelOne extends Phaser.Scene{
         });
 
 
+
         // COIN OBJECTS
+        this.coinGroup = this.physics.add.staticGroup();
+
         this.coins = this.map.createFromObjects("Coins", {
             name: "coin",
             key: "characters",
@@ -292,6 +306,8 @@ class LevelOne extends Phaser.Scene{
         });
         
         // KEY OBJECTS
+        this.keyGroup = this.physics.add.staticGroup();
+
         this.keyMap = this.map.createFromObjects("Keys", {
             name: "key",
             key: "characters",
@@ -313,6 +329,8 @@ class LevelOne extends Phaser.Scene{
 
         // STATUE OBJECTS
         const statueObjects = this.map.getObjectLayer('CypherStatues').objects;
+        this.statueGroup = this.physics.add.staticGroup();
+
         statueObjects.forEach(obj => {
             // Get tile's global ID in tilesheet
             const gid = obj.gid;
@@ -342,6 +360,12 @@ class LevelOne extends Phaser.Scene{
         
 
         /////////////// *** COLLISION DETECTION*** ///////////////
+
+
+        // PLAYER OVERLAP WITH ZONES
+        this.physics.add.overlap(this.player, this.zones, (player, zone) => {
+            zone.isPlayerInside = true;
+        });
 
         // PLAYER COLLISION WITH LOCKS
         this.physics.add.collider(this.player, this.lockGroup);
@@ -470,8 +494,39 @@ class LevelOne extends Phaser.Scene{
     }
 
     update() {
+        
 
-        const cam = this.cameras.main;
+        // CHECK WHAT ZONE THE PLAYER IS IN
+
+        // Reset current zones
+        this.player.currentZones.clear();
+
+        // Check each zone
+        this.zones.children.each(zone => {
+            const playerBounds = this.player.getBounds();
+            const zoneBounds = zone.getBounds();
+
+            if (Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, zoneBounds)) {
+                this.player.currentZones.add(zone.zoneType);
+            }
+        });
+
+        // Update player state based on zone
+        if (this.player.currentZone === "water") {
+            this.player.inWater = true;
+            console.log(this.player.currentZone)
+        } 
+        else if (this.player.currentZone === "flipG") {
+            this.player.noGravity = true;
+        }
+        else {
+            this.player.inWater = false;
+            this.player.noGravity = false;
+        }
+
+        // UPDATE PLAYER
+        this.player.update()
+
 
         // UPDATE ENEMIES
         this.enemies.children.iterate(enemy => {
@@ -480,10 +535,8 @@ class LevelOne extends Phaser.Scene{
             }
         });
 
-        // UPDATE PLAYER
-        this.player.update()
 
-        // If lock exists, call update
+        // If lock exists, call update for it
         this.pendingUnlocks.forEach(lock => {
             if (lock.update) lock.update();
         });
