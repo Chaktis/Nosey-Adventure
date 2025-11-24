@@ -108,13 +108,12 @@ class LevelOne extends Phaser.Scene{
             this.enemies.add(enemy);
         });
 
-
+        
 
         // LAYER COLLISIONS
         this.physics.add.collider(this.player, this.collisionLayer);
         this.physics.add.collider(this.enemies, this.collisionLayer);
         
-
 
 
         /////////////// ***OBJECT CREATION*** ///////////////

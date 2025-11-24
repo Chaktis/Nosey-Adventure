@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="164" height="120" tilewidth="16" tileheight="16" infinite="0" nextlayerid="16" nextobjectid="1329">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="164" height="120" tilewidth="16" tileheight="16" infinite="0" nextlayerid="16" nextobjectid="1330">
  <editorsettings>
   <export target="final_game.json" format="json"/>
  </editorsettings>
