@@ -1,9 +1,27 @@
 class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-    constructor(scene, x, y, patrolDistance) {
+    constructor(scene, x, y, patrolDistance, variant = "Normal") {
         super(scene, x, y);
+
         this.scene = scene;
-        
+        this.variant = variant;  // normal or water
+        this.patrolDistance = patrolDistance;
+
+        // Create animation key prefix
+        // Example: "ground" + "Water" → "groundWater"
+        this.skin = this.getSkinPrefix();
+
+
+        // ANIMATION KEYS
+        this.animKeys = {
+            idle: this.skin + "Idle",
+            hurt: this.skin + "Hurt",
+            die: this.skin + "Die"
+        };
+
+        // PHYSICS
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
 
         // PATHING
         this.startX = x;     // save original spawn point
@@ -17,11 +35,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.damageCooldown = 300;
         this.canTakeDamage = true;
 
-        // PHYSICS
-        scene.add.existing(this);
-        scene.physics.add.existing(this);
-
-
+        
         // Death particles
         this.deathParticles = this.scene.add.particles(0, 0, "coin_particle", {
             quantity: 20,
@@ -34,12 +48,17 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             emitting: false // only triggered manually with explode 
         });
     }
+
+    getSkinPrefix() {
+        // Override in subclasses
+        return "";
+    }
 }
 
 class GroundEnemy extends Enemy {
     
-    constructor(scene, x, y, patrolDistance) {
-        super(scene, x, y, patrolDistance);
+    constructor(scene, x, y, patrolDistance, variant) {
+        super(scene, x, y, patrolDistance, variant);
 
         this.speed = 50;
         this.health = 400;
@@ -49,88 +68,65 @@ class GroundEnemy extends Enemy {
         this.body.setOffset(0, 0);
     }
 
-    update() {
+    
+    getSkinPrefix() {
+        return this.variant === "Water" ? "GroundWater" : "Ground";
+    }
 
+    update() {
         // If the enemy isn't alive, return
         if (!this.alive) return;
 
-        else {
-            // WALKING
-            // Set the velocity in the direction that the enemy is moving
-            this.setVelocityX(this.speed * this.direction);
 
-            // Check if enemy has reached patrol limit
-            if (this.x > this.startX + this.patrolDistance) {
-                this.direction = -1;
-                this.anims.play('groundIdle', true);
-                this.setFlip(true, false); // face left
+        // WALKING
+        this.setVelocityX(this.speed * this.direction);
 
-            } else if (this.x < this.startX - this.patrolDistance) {
-                this.direction = 1;
-                this.anims.play('groundIdle', true);
-                this.setFlip(false, false); // face right
-            }
+        // Check if enemy has reached patrol limit
+        if (this.x > this.startX + this.patrolDistance) {
+            this.direction = -1;
+            this.anims.play(this.animKeys.idle, true);
+            this.setFlip(true, false); // face left
+
+        } else if (this.x < this.startX - this.patrolDistance) {
+            this.direction = 1;
+            this.anims.play(this.animKeys.idle, true);
+            this.setFlip(false, false); // face right
         }
     }
 
-    takeDamage() {
 
-        // If the enemy isn't alive or can't take damage, don't trigger
+    takeDamage() {
         if (!this.alive || !this.canTakeDamage) return;
 
-        // Reduce health + play sound
         this.health -= 100;
-        this.speed = 0
-        this.scene.sound.play("enemyHurt", {volume: 0.5});
-        this.play('groundHurt');
+        this.speed = 0;
 
+        this.scene.sound.play("enemyHurt");
+        this.play(this.animKeys.hurt);
 
-        // Return to idle once animation finishes
-            this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, (anim, frame) => {
-                if (anim.key === 'groundHurt' && this.alive) {
-                    this.play('groundIdle');
-                    this.speed = 50;
-                }
-            });
-
-
-        this.canTakeDamage = false
-
-        // Reset flag after a delay
-        this.scene.time.delayedCall(this.damageCooldown, () => {
-            this.canTakeDamage = true;
+        this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+            if (this.alive) {
+                this.play(this.animKeys.idle);
+                this.speed = 50;
+            }
         });
 
-        // Delete the enemy once it's dead
+        this.canTakeDamage = false;
+        this.scene.time.delayedCall(300, () => this.canTakeDamage = true);
+
         if (this.health <= 0) {
             this.alive = false;
+            this.play(this.animKeys.die);
 
-            // play death animation
-            this.play('groundDie');
-
-            //trigger particle effect
-            this.deathParticles.explode(25, this.x, this.y); // Number determines # of particles
-
-            // play death sound
-            //this.scene.sound.play("enemyDeath", {volume: 0.5});
-
-            // remove from scene
-            this.on('animationcomplete', () => {
-                this.disableBody(true, true);  
-                this.setVelocity(0, 0);
-                this.setCollideWorldBounds(false);
-                this.setImmovable(true);
-                this.body.enable = false;
-                this.destroy();
-            });
+            this.on("animationcomplete", () => this.destroy());
         }
     }
 }
 
 class FlyingEnemy extends Enemy {
 
-    constructor(scene, x, y, patrolDistance) {
-        super(scene, x, y, patrolDistance);
+    constructor(scene, x, y, patrolDistance, variant) {
+        super(scene, x, y, patrolDistance, variant);
 
         this.speed = 50;
         this.health = 300;
@@ -141,76 +137,50 @@ class FlyingEnemy extends Enemy {
         this.body.setOffset(5, 1.5);
     }
 
-    update() {
+    getSkinPrefix() {
+        return this.variant === "Water" ? "FlyingWater" : "Flying";
+    }
 
-        // If the enemy isn't alive, return
+
+    update() {
         if (!this.alive) return;
 
-        else {
-            // FLYING
-            // set the velocity in the direction that the enemy is moving
-            this.setVelocityY(this.speed * this.direction);
+        this.setVelocityY(this.speed * this.direction);
 
-            // Check if enemy has reached patrol limit
-            if (this.y > this.startY + this.patrolDistance) {
-                this.direction = -1;
-                this.anims.play('flyingIdle', true);
+        if (this.y > this.startY + this.patrolDistance) {
+            this.direction = -1;
+            this.anims.play(this.animKeys.idle, true);
 
-            } else if (this.y < this.startY - this.patrolDistance) {
-                this.direction = 1;
-                this.anims.play('flyingIdle', true);
-            }
+        } else if (this.y < this.startY - this.patrolDistance) {
+            this.direction = 1;
+            this.anims.play(this.animKeys.idle, true);
         }
     }
 
     takeDamage() {
-
-        /// If the enemy isn't alive or can't take damage, don't trigger
         if (!this.alive || !this.canTakeDamage) return;
 
-        // Reduce health + play sounds/anims
         this.health -= 100;
-        this.speed = 0
-        this.scene.sound.play("enemyHurt", {volume: 0.5});
-        this.play('flyingHurt');
+        this.speed = 0;
 
-        // Return to idle once animation finishes
-            this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, (anim, frame) => {
-                if (anim.key === 'flyingHurt' && this.alive) {
-                    this.play('flyingIdle');
-                    this.speed = 50;
-                }
-            });
+        this.scene.sound.play("enemyHurt");
+        this.play(this.animKeys.hurt);
 
-        this.canTakeDamage = false
-
-        // Reset flag after a delay
-        this.scene.time.delayedCall(this.damageCooldown, () => {
-            this.canTakeDamage = true;
+        this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+            if (this.alive) {
+                this.play(this.animKeys.idle);
+                this.speed = 50;
+            }
         });
 
-        // Delete the enemy once it's dead
+        this.canTakeDamage = false;
+        this.scene.time.delayedCall(300, () => this.canTakeDamage = true);
+
         if (this.health <= 0) {
             this.alive = false;
+            this.play(this.animKeys.die);
 
-            // play death animation
-            this.play('flyingDie');
-
-            //trigger particle effect
-            this.deathParticles.explode(20, this.x, this.y); // Number determines # of particles
-
-            // play death sound
-            //this.scene.sound.play("enemyDeath", {volume: 0.5});
-
-            // remove physics and collisions
-            this.on('animationcomplete', () => {
-                this.disableBody(true, true);
-                this.setVelocity(0, 0);
-                this.setCollideWorldBounds(false);
-                this.setImmovable(true);
-                this.body.enable = false;
-                this.destroy();
-            });
+            this.on("animationcomplete", () => this.destroy());
         }
     }
 }

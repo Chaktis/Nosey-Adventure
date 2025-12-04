@@ -132,11 +132,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
 
 
+        ///////// PLAYER STATES//////////
 
-            // PLAYER STATES
             // Reset zone effects
             this.inWater = this.currentZones.has("water");
             this.noGravity = this.currentZones.has("flipG");
+
 
 
             // EXITING/ENTERING WATER
@@ -225,12 +226,13 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             }
 
 
-            // Animation logic
-            ////// MIGHT NEED TO UPDATE THIS, right now will only play if player is in normal state
-            // Could also just have animation logic for each state?
+            // ANIMATION LOGIC
             else {
                 if (!this.isAttacking && !this.isHurt) { // If player isn't attacking or hurt
-                    if (!this.body.blocked.down && this.anims.currentAnim?.key !== 'jump') {
+                    if (this.inWater) { // Play water specific anims
+                        this.anims.play('swim', true);
+                    }
+                    else if (!this.body.blocked.down && this.anims.currentAnim?.key !== 'jump') {
                             this.anims.play('jump'); // Need this to be separate from jumping function, since otherwise it will be overridden
                     } 
                     else if (this.body.blocked.down) {

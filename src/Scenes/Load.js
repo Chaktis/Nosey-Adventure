@@ -32,6 +32,10 @@ class Load extends Phaser.Scene {
             frameWidth: 22,  
             frameHeight: 16
         });
+        this.load.spritesheet('bubblesnail', 'bubblesnail.png', {
+            frameWidth: 21,  
+            frameHeight: 16
+        });
         this.load.spritesheet('monochrome_tilemap_spritesheet', 'monochrome_tilemap_transparent_packed.png', {
             frameWidth: 16,  
             frameHeight: 16
@@ -99,6 +103,20 @@ class Load extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'swim',
+            frames: [
+                {key: 'characters', frame: 283},
+                {key: 'characters', frame: 284},
+                {key: 'characters', frame: 285},
+                {key: 'characters', frame: 286},
+                {key: 'characters', frame: 287},
+                {key: 'characters', frame: 288}
+            ],
+            frameRate: 8,
+            repeat: 0
+        });
+
+        this.anims.create({
             key: 'slash',
             frames: [
                 {key: 'characters', frame: 247},
@@ -120,11 +138,11 @@ class Load extends Phaser.Scene {
 
         
 
-        //// ENEMY ANIMATIONS ////
+        ////////// ENEMY ANIMATIONS ///////////
 
-        // Ground Enemy
+        // KNIGHT
         this.anims.create({
-            key: 'groundIdle',
+            key: 'GroundIdle',
             frames: [
                 {key: 'enemies', frame: 4},
                 {key: 'enemies', frame: 5},
@@ -138,7 +156,7 @@ class Load extends Phaser.Scene {
         });
 
         this.anims.create({
-            key: 'groundHurt',
+            key: 'GroundHurt',
             frames: [
                 {key: 'enemies', frame: 21},
                 {key: 'enemies', frame: 10}
@@ -148,7 +166,7 @@ class Load extends Phaser.Scene {
         });
 
         this.anims.create({
-            key: 'groundDie',
+            key: 'GroundDie',
             frames: [
                 {key: 'enemies', frame: 21}
             ],
@@ -157,9 +175,50 @@ class Load extends Phaser.Scene {
         });
 
 
-        // Flying Enemy
+
+        // BUBBLESNAIL
         this.anims.create({
-            key: 'flyingIdle',
+            key: 'GroundWaterIdle',
+            frames: [
+                {key: 'bubblesnail', frame: 0},
+                {key: 'bubblesnail', frame: 1},
+                {key: 'bubblesnail', frame: 2},
+                {key: 'bubblesnail', frame: 3},
+                {key: 'bubblesnail', frame: 4},
+                {key: 'bubblesnail', frame: 5},
+                {key: 'bubblesnail', frame: 6},
+                {key: 'bubblesnail', frame: 7},
+                {key: 'bubblesnail', frame: 8},
+                {key: 'bubblesnail', frame: 9}
+            ],
+            frameRate: 8,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'GroundWaterHurt',
+            frames: [
+                {key: 'enemies', frame: 21},
+                {key: 'bubblesnail', frame: 10}
+            ],
+            frameRate: 8,
+            repeat: 0
+        });
+
+        this.anims.create({
+            key: 'GroundWaterDie',
+            frames: [
+                {key: 'enemies', frame: 21}
+            ],
+            frameRate: 8,
+            repeat: -1
+        });
+
+
+
+        // BAT
+        this.anims.create({
+            key: 'FlyingIdle',
             frames: [
                 {key: 'nosebat', frame: 0},
                 {key: 'nosebat', frame: 1},
@@ -172,7 +231,7 @@ class Load extends Phaser.Scene {
         });
 
         this.anims.create({
-            key: 'flyingHurt',
+            key: 'FlyingHurt',
             frames: [
                 {key: 'enemies', frame: 21},
                 {key: 'nosebat', frame: 5}
@@ -183,13 +242,53 @@ class Load extends Phaser.Scene {
         });
 
         this.anims.create({
-            key: 'flyingDie',
+            key: 'FlyingDie',
             frames: [
                 {key: 'enemies', frame: 21}
             ],
             frameRate: 8,
             repeat: -1
         });
+
+
+        // JELLYFISH
+        // USES ANGLERFISH SPRITES CURRENTLY
+        this.anims.create({
+            key: 'FlyingWaterIdle',
+            frames: [
+                {key: 'enemies', frame: 22},
+                {key: 'enemies', frame: 23},
+                {key: 'enemies', frame: 24},
+                {key: 'enemies', frame: 25},
+                {key: 'enemies', frame: 26},
+                {key: 'enemies', frame: 27}
+            ],
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'FlyingWaterHurt',
+            frames: [
+                {key: 'enemies', frame: 21},
+                {key: 'enemies', frame: 28}
+                
+            ],
+            frameRate: 8,
+            repeat: 0
+        });
+
+        this.anims.create({
+            key: 'FlyingWaterDie',
+            frames: [
+                {key: 'enemies', frame: 21}
+            ],
+            frameRate: 8,
+            repeat: -1
+        });
+
+
+
 
         // Start level scene
         this.scene.start("LevelOne");
