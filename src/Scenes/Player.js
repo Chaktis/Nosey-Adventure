@@ -86,7 +86,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         
         this.playerAlive = true;
         this.canTakeDamage = true;
-        this.damageCooldown = 5000; 
+        this.damageCooldown = 3000; 
     }
 
 

@@ -117,7 +117,7 @@ class GroundEnemy extends Enemy {
         if (this.health <= 0) {
             this.alive = false;
             this.play(this.animKeys.die);
-
+            this.deathParticles.explode(20, this.x, this.y);
             this.on("animationcomplete", () => this.destroy());
         }
     }
@@ -179,7 +179,7 @@ class FlyingEnemy extends Enemy {
         if (this.health <= 0) {
             this.alive = false;
             this.play(this.animKeys.die);
-
+            this.deathParticles.explode(20, this.x, this.y);
             this.on("animationcomplete", () => this.destroy());
         }
     }

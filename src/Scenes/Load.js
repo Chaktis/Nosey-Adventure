@@ -12,12 +12,18 @@ class Load extends Phaser.Scene {
         this.load.image("crystal_tilemap", "crystal_tilemap.png");
         this.load.image("Dungeon_Expanded_Tilemap", "DungeonTilesetExpanded.png");
         this.load.image("OvergrownSheetEx", "OvergrownSheetEx.png");
+        this.load.image("UnderwaterTiles", "UnderwaterTiles.png");
+        this.load.image("AnimatedWater", "AnimatedWater.png");
+        this.load.spritesheet("CypherStatues", "CypherStatues.png", {frameWidth: 16, frameHeight: 32});
+        this.load.image("AlgaeTiles", "AlgaeTiles.png");
+
 
         // Load images
         this.load.image("coin_particle", "coin_particle.png");
         this.load.image('heart', 'heart.png')
         this.load.image('coin', 'coin.png')
         this.load.image('key', 'key.png') 
+
 
         // Load animation spritesheets
         this.load.spritesheet('characters', 'monochrome_tilemap_transparent_packed.png', {

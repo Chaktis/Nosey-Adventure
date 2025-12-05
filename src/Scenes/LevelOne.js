@@ -9,7 +9,7 @@ class LevelOne extends Phaser.Scene{
         this.physics.world.gravity.y = 950;
 
         // Turn off debug
-        //this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
+        this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true;
 
         // COUNTERS
         this.coinCount = 0;
@@ -59,7 +59,11 @@ class LevelOne extends Phaser.Scene{
         const oneBitCrystal = this.map.addTilesetImage("crystal_tilemap", "crystal_tilemap");
         const oneBitDungeon = this.map.addTilesetImage("Dungeon_Expanded_Tilemap", "Dungeon_Expanded_Tilemap");
         const oneBitOvergrown = this.map.addTilesetImage("OvergrownSheetEx", "OvergrownSheetEx");
-        const tilesets = [oneBit, oneBitTransparent, oneBitCrystal, oneBitDungeon, oneBitOvergrown];
+        const oneBitUnderwater = this.map.addTilesetImage("UnderwaterTiles", "UnderwaterTiles");
+        const oneBitWater = this.map.addTilesetImage("AnimatedWater", "AnimatedWater");
+        const oneBitStatues = this.map.addTilesetImage("CypherStatues", "CypherStatues", 16, 32);
+        const oneBitAlgae = this.map.addTilesetImage("AlgaeTiles", "AlgaeTiles");
+        const tilesets = [oneBit, oneBitTransparent, oneBitCrystal, oneBitDungeon, oneBitOvergrown, oneBitUnderwater, oneBitWater, oneBitStatues, oneBitAlgae];
 
 
         // LAYER SETUP
@@ -75,15 +79,15 @@ class LevelOne extends Phaser.Scene{
         this.groundLayer = this.map.createLayer("Base-Layer", tilesets, 0, 0);
         this.groundLayer.setScale(2.0);
 
-        this.foregroundLayer = this.map.createLayer("Foreground", tilesets, 0, 0);
-        this.foregroundLayer.setScale(2.0);
-
-
 
         // PLAYER SETUP
         this.player = new Player(this, 2750, 10, "characters", 240, this.inputKeys);
         this.player.setCollideWorldBounds(true);
 
+
+        // FOREGROUND LOAD (needs to go after player so it's in front)
+        this.foregroundLayer = this.map.createLayer("Foreground", tilesets, 0, 0);
+        this.foregroundLayer.setScale(2.0);
 
 
         // ENEMY SETUP
@@ -145,55 +149,43 @@ class LevelOne extends Phaser.Scene{
         this.doorGroup = this.physics.add.staticGroup();
 
         doorObject.forEach(obj => {
+            const tileIndex = obj.gid - this.map.tilesets[0].firstgid;
 
-            // set characteristics
             const door = this.doorGroup.create(
                 obj.x * 2,
                 obj.y * 2,
-                'characters'       
+                'characters',
+                tileIndex
             );
 
             door.setOrigin(0, 1);
             door.setScale(2.0);
 
-            // door collision box
-            let bodyX = 32;
-            let bodyY = 32;
-            let offsetX = 8;
-            let offsetY = -24;
-
-            door.body.setSize(bodyX, bodyY);
-            door.body.setOffset(offsetX, offsetY);
-            this.doorGroup.add(door);
+            door.body.setSize(32, 32);
+            door.body.setOffset(8, -24);
         });
 
 
-        // LOCK OBJECTS
+        const lockObjects = this.map.getObjectLayer('Gate').objects;
         this.lockGroup = this.physics.add.staticGroup();
         this.lockArray = [];
-        const lockObjects = this.map.getObjectLayer('Gate').objects;
 
         lockObjects.forEach(obj => {
+            const tileIndex = obj.gid - this.map.tilesets[0].firstgid;
 
-            // set characteristics
             const lock = this.lockGroup.create(
                 obj.x * 2,
                 obj.y * 2,
-                'monochrome_tilemap_spritesheet'           
+                'characters',
+                tileIndex
             );
 
             lock.setOrigin(0, 1);
             lock.setScale(2.0);
 
-            // Lock collision box
-            let bodyX = 32;
-            let bodyY = 32;
-            let offsetX = 8;
-            let offsetY = -24;
+            lock.body.setSize(32, 32);
+            lock.body.setOffset(8, -24);
 
-            lock.body.setSize(bodyX, bodyY);
-            lock.body.setOffset(offsetX, offsetY);
-            this.lockGroup.add(lock);
             this.lockArray.push(lock);
         });
 
@@ -330,20 +322,22 @@ class LevelOne extends Phaser.Scene{
         const statueObjects = this.map.getObjectLayer('CypherStatues').objects;
         this.statueGroup = this.physics.add.staticGroup();
 
+        // Find CypherStatues tileset
+        const statueTileset = this.map.tilesets.find(ts => ts.name === "CypherStatues");
+        const firstgid = statueTileset.firstgid;
+
         statueObjects.forEach(obj => {
             // Get tile's global ID in tilesheet
             const gid = obj.gid;
 
-            // Convert GID to the frame index in the tileset’s image
-            const tileset = this.map.tilesets[0]; // Find specific tileset
-            const firstgid = tileset.firstgid;
-            const frameIndex = gid - firstgid; // get local frame index
+            // Local frame index inside the tileset
+            const frameIndex = gid - firstgid;
 
             // Create the sprite using that frame
             const statue = this.statueGroup.create(
                 obj.x * 2,
                 obj.y * 2,
-                'characters',   
+                'CypherStatues',   
                 frameIndex 
             );
 
